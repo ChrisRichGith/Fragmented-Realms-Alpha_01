@@ -109,18 +109,18 @@ function init() {
     window.addEventListener('resize', resizeCanvas);
 
     // Load images
-    playerImage.src = 'Player.png';
-    enemyImage.src = 'Gegner.png';
-    bossImage.src = 'Boss_01.png';
-    explosionImage.src = 'explosion.png';
+    playerImage.src = '../../images/Space-Shooter/Player.png';
+    enemyImage.src = '../../images/Space-Shooter/Gegner.png';
+    bossImage.src = '../../images/Space-Shooter/Boss_01.png';
+    explosionImage.src = '../../images/Space-Shooter/explosion.png';
 
     // Load power-up images
     for (const key in powerUpImages) {
-        powerUpImages[key].src = `${key}.png`;
+        powerUpImages[key].src = `../../images/Space-Shooter/${key}.png`;
     }
 
     // Load background tile
-    backgroundImage.src = 'Kachel01.png';
+    backgroundImage.src = '../../images/Space-Shooter/Kachel01.png';
 
     // Set up event listeners
     setupEventListeners();
