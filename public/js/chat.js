@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const GAMES_CONFIG = {
         'space-shooter': {
             displayName: 'Space Shooter',
-            icon: '/images/space-shooter.png',
+            icon: '/images/Chat/space-shooter.png',
             costs: { gold: 100, kristall: 25 }
         }
     };
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (unlockedGames.includes(gameId)) {
                 gameElement.innerHTML = `<a href="/games/${gameId}/index.html" target="_blank" class="play-button"><img src="${game.icon}" alt="${game.displayName}" class="game-icon"><span>${game.displayName} spielen</span></a>`;
             } else {
-                const costString = Object.entries(game.costs).map(([resource, cost]) => `<span class="cost-item">${cost} <img src="/images/${resource}.png" class="resource-cost-icon"></span>`).join('');
+                const costString = Object.entries(game.costs).map(([resource, cost]) => `<span class="cost-item">${cost} <img src="/images/Chat/${resource}.png" class="resource-cost-icon"></span>`).join('');
                 gameElement.innerHTML = `<button class="unlock-button" data-gameid="${gameId}"><img src="${game.icon}" alt="${game.displayName}" class="game-icon"><span>${game.displayName} freischalten</span><div class="cost-container">${costString}</div></button>`;
             }
             gameList.appendChild(gameElement);
