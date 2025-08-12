@@ -75,5 +75,51 @@
     </audio>
 
     <script src="game.js"></script>
+
+    <!-- Custom Character Creation Modal -->
+    <div id="custom-char-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Charakter erstellen</h2>
+
+            <div class="modal-section">
+                <label for="char-name-input">Charaktername:</label>
+                <input type="text" id="char-name-input" maxlength="20" placeholder="Name eingeben">
+            </div>
+
+            <div class="modal-section">
+                <h3>Attribute</h3>
+                <p>Punkte zu verteilen: <span id="points-remaining">15</span></p>
+                <div class="attribute-row">
+                    <label>Stärke</label>
+                    <div class="attribute-control">
+                        <button class="btn-attribute" data-stat="strength" data-action="minus">-</button>
+                        <input type="number" id="strength-input" value="5" readonly>
+                        <button class="btn-attribute" data-stat="strength" data-action="plus">+</button>
+                    </div>
+                </div>
+                <div class="attribute-row">
+                    <label>Geschick</label>
+                    <div class="attribute-control">
+                        <button class="btn-attribute" data-stat="dexterity" data-action="minus">-</button>
+                        <input type="number" id="dexterity-input" value="5" readonly>
+                        <button class="btn-attribute" data-stat="dexterity" data-action="plus">+</button>
+                    </div>
+                </div>
+                <div class="attribute-row">
+                    <label>Intelligenz</label>
+                    <div class="attribute-control">
+                        <button class="btn-attribute" data-stat="intelligence" data-action="minus">-</button>
+                        <input type="number" id="intelligence-input" value="5" readonly>
+                        <button class="btn-attribute" data-stat="intelligence" data-action="plus">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button id="confirm-char-btn">Bestätigen</button>
+                <button id="cancel-char-btn">Abbrechen</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
