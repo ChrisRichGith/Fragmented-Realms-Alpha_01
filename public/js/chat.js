@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUser = null;
     let isAdmin = false;
     let sendToTarget = null;
+    let characterIsSelected = false;
 
     // --- Configs ---
     const GAMES_CONFIG = {
@@ -144,6 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
             charStrength.textContent = selectedChar.stats.strength;
             charDexterity.textContent = selectedChar.stats.dexterity;
             charIntelligence.textContent = selectedChar.stats.intelligence;
+            characterIsSelected = true;
+            startRpgBtn.textContent = 'Spiel fortsetzen';
         } else {
             // Fallback to default placeholder and base RPG stats if no character is selected
             portraitEl.src = '/images/Chat/placeholder.svg';
@@ -151,6 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
             charStrength.textContent = rpgData.strength || 0;
             charDexterity.textContent = rpgData.dexterity || 0;
             charIntelligence.textContent = rpgData.intelligence || 0;
+            characterIsSelected = false;
+            startRpgBtn.textContent = 'RPG starten';
         }
     }
 
@@ -348,7 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startRpgBtn.addEventListener('click', () => {
-        window.open('/games/rpg/index.html', '_blank');
+        const url = characterIsSelected ? '/games/rpg/index.html?action=continue' : '/games/rpg/index.html';
+        window.open(url, '_blank');
     });
 
     if (adminPanelBtn) {
@@ -514,19 +520,23 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Received character data:', charData);
 
             const portraitEl = document.getElementById('char-portrait');
+            const nameEl = document.getElementById('char-name');
+
             if (portraitEl) {
                 portraitEl.src = charData.image;
             }
-
-            // Also update the stats display
-            if (charData.name) {
-                document.getElementById('char-name').textContent = charData.name;
+            if (nameEl && charData.name) {
+                nameEl.textContent = charData.name;
             }
             if (charData.stats) {
                 charStrength.textContent = charData.stats.strength;
                 charDexterity.textContent = charData.stats.dexterity;
                 charIntelligence.textContent = charData.stats.intelligence;
             }
+
+            // Set state for direct game start
+            characterIsSelected = true;
+            startRpgBtn.textContent = 'Spiel fortsetzen';
 
             // Also save the character data to the server
             socket.emit('character:save', charData);

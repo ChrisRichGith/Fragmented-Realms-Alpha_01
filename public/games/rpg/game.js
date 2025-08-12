@@ -108,12 +108,17 @@ function init() {
     // Set up event listeners
     setupEventListeners();
     
-    // Show title screen
-    showScreen('title');
-
     // Populate character creation screen
     populateCharacterCreation();
     
+    // Check for direct start action
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'continue') {
+        showScreen('game');
+    } else {
+        showScreen('title');
+    }
+
     // Start game loop (paused until game starts)
     gameLoop = requestAnimationFrame(update);
 }
@@ -332,7 +337,7 @@ function handleConfirmPredefName() {
     const charData = {
         name: charName,
         image: classData.img[card.dataset.gender],
-        stats: { strength: 5, dexterity: 5, intelligence: 5 } // Default stats
+        stats: classData.stats
     };
 
     if (window.opener) {
@@ -350,26 +355,31 @@ function populateCharacterCreation() {
         {
             name: 'Krieger',
             description: 'Stark und widerstandsfähig, ein Meister des Nahkampfes.',
+            stats: { strength: 8, dexterity: 4, intelligence: 3 },
             img: { male: '/images/RPG/Krieger.png', female: '/images/RPG/Kriegerin.png' }
         },
         {
             name: 'Magier',
             description: 'Beherrscht die arkanen Künste, um Feinde aus der Ferne zu vernichten.',
+            stats: { strength: 2, dexterity: 5, intelligence: 8 },
             img: { male: '/images/RPG/Magier.png', female: '/images/RPG/Magierin.png' }
         },
         {
             name: 'Schurke',
             description: 'Ein listiger Kämpfer, der aus den Schatten zuschlägt.',
+            stats: { strength: 4, dexterity: 8, intelligence: 3 },
             img: { male: '/images/RPG/Schurke.png', female: '/images/RPG/Schurkin.png' }
         },
         {
             name: 'Bogenschütze',
             description: 'Ein Meisterschütze mit Pfeil und Bogen.',
+            stats: { strength: 4, dexterity: 8, intelligence: 3 },
             img: { male: '/images/RPG/Archer.png', female: '/images/RPG/Archerin.png' }
         },
         {
             name: 'Heiler',
             description: 'Ein heiliger Kleriker, der Verbündete heilt und schützt.',
+            stats: { strength: 3, dexterity: 4, intelligence: 8 },
             img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' }
         },
         {
@@ -391,10 +401,22 @@ function populateCharacterCreation() {
             card.dataset.iscustom = 'true';
         }
 
+        let statsHtml = '';
+        if (classData.stats) {
+            statsHtml = `
+                <div class="card-stats">
+                    <span>STÄ: ${classData.stats.strength}</span>
+                    <span>GES: ${classData.stats.dexterity}</span>
+                    <span>INT: ${classData.stats.intelligence}</span>
+                </div>
+            `;
+        }
+
         card.innerHTML = `
             <img src="${classData.img.male}" alt="${classData.name}">
             <h3>${classData.name}</h3>
             <p>${classData.description}</p>
+            ${statsHtml}
             <div class="gender-selector">
                 <button class="gender-btn active" data-gender="male">Männlich</button>
                 <button class="gender-btn" data-gender="female">Weiblich</button>
