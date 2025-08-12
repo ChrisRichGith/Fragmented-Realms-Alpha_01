@@ -6,6 +6,18 @@ const config = {
     playerSize: 30
 };
 
+const SECRET_CLASSES = [
+    {
+        name: 'Arkaner Komponist',
+        requirements: { strength: 1, dexterity: 7, intelligence: 7 },
+        message: 'Herzlichen Glückwunsch: Du hast den Arkanen Komponisten freigeschaltet.',
+        img: {
+            male: '/images/RPG/arkanerKomponist.png',
+            female: '/images/RPG/arkaneKomponistin.png'
+        }
+    }
+];
+
 // Game objects
 let player, enemies = [];
 let canvas, ctx, gameLoop, keys = {};
@@ -248,8 +260,29 @@ function handleConfirmCustomChar() {
     console.log('Custom character created:', customCharState);
 
     const customCard = document.querySelector('.character-card[data-iscustom="true"]');
+
+    // Check for secret class unlock
+    let unlockedClass = null;
+    for (const secretClass of SECRET_CLASSES) {
+        const reqs = secretClass.requirements;
+        const stats = customCharState.stats;
+        if (stats.strength === reqs.strength &&
+            stats.dexterity === reqs.dexterity &&
+            stats.intelligence === reqs.intelligence) {
+            unlockedClass = secretClass;
+            break;
+        }
+    }
+
     if (customCard) {
         customCard.querySelector('h3').textContent = customCharState.name;
+
+        if (unlockedClass) {
+            alert(unlockedClass.message);
+            const selectedGender = customCard.dataset.gender;
+            customCard.querySelector('img').src = unlockedClass.img[selectedGender];
+        }
+
         customCard.querySelectorAll('.gender-btn').forEach(btn => btn.disabled = true);
 
         document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
