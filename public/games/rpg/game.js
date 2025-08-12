@@ -405,7 +405,7 @@ function populateCharacterCreation() {
 
             if (window.opener) {
                 window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
-                window.close();
+                // window.close(); // Removed as per user request
             } else {
                 alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
             }
