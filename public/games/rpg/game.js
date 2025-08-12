@@ -157,12 +157,12 @@ function showScreen(screenId) {
 
 function populateCharacterCreation() {
     const characters = [
-        { name: 'Krieger', img: '/images/Krieger.png', description: 'Ein Meister des Nahkampfes, stark und widerstandsfähig.' },
-        { name: 'Kriegerin', img: '/images/Kriegerin.png', description: 'Eine Meisterin des Nahkampfes, stark und widerstandsfähig.' },
-        { name: 'Magier', img: '/images/Magier.png', description: 'Ein mächtiger Zauberer, der die arkanen Künste beherrscht.' },
-        { name: 'Schurke', img: '/images/Schurke.png', description: 'Ein listiger Dieb, der aus den Schatten zuschlägt.' },
-        { name: 'Ranger', img: '/images/Ranger.png', description: 'Ein geschickter Jäger, der mit Pfeil und Bogen umgehen kann.' },
-        { name: 'Arkaner Komponist', img: '/images/Arkaner Komponist.png', description: 'Ein seltener Barde, der Musik und Magie vereint.' }
+        { name: 'Krieger', img: '/images/RPG/Krieger.png', description: 'Ein Meister des Nahkampfes, stark und widerstandsfähig.' },
+        { name: 'Kriegerin', img: '/images/RPG/Kriegerin.png', description: 'Eine Meisterin des Nahkampfes, stark und widerstandsfähig.' },
+        { name: 'Magier', img: '/images/RPG/Magier.png', description: 'Ein mächtiger Zauberer, der die arkanen Künste beherrscht.' },
+        { name: 'Schurke', img: '/images/RPG/Schurke.png', description: 'Ein listiger Dieb, der aus den Schatten zuschlägt.' },
+        { name: 'Ranger', img: '/images/RPG/Ranger.png', description: 'Ein geschickter Jäger, der mit Pfeil und Bogen umgehen kann.' },
+        { name: 'Arkaner Komponist', img: '/images/RPG/Arkaner Komponist.png', description: 'Ein seltener Barde, der Musik und Magie vereint.' }
     ];
 
     const container = document.getElementById('character-cards-container');
