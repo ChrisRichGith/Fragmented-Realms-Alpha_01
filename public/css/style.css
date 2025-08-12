@@ -585,6 +585,15 @@ header {
     background-color: #2c2a3e;
 }
 
+#char-name {
+    text-align: center;
+    color: #f5eacb;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    font-weight: bold;
+    min-height: 20px; /* Ensure it takes up space even when empty */
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;

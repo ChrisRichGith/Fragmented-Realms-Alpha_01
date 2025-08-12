@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUser = null;
     let isAdmin = false;
     let sendToTarget = null;
+    let characterIsSelected = false;
 
     // --- Configs ---
     const GAMES_CONFIG = {
@@ -123,14 +124,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateCharacterSheet(rpgData) {
+    function updateCharacterSheet(userData) {
+        if (!userData) return;
         charSheet.style.display = 'block';
-        const data = rpgData || {};
-        charLevel.textContent = data.level || 1;
-        charXP.textContent = data.xp || 0;
-        charStrength.textContent = data.strength || 0;
-        charDexterity.textContent = data.dexterity || 0;
-        charIntelligence.textContent = data.intelligence || 0;
+
+        const rpgData = userData.rpg || {};
+        const selectedChar = userData.selectedCharacter;
+
+        // Update level and XP from base RPG stats
+        charLevel.textContent = rpgData.level || 1;
+        charXP.textContent = rpgData.xp || 0;
+
+        // Update portrait, name, and stats from the selected character if it exists
+        const portraitEl = document.getElementById('char-portrait');
+        const nameEl = document.getElementById('char-name');
+
+        if (selectedChar) {
+            portraitEl.src = selectedChar.image;
+            nameEl.textContent = selectedChar.name;
+            charStrength.textContent = selectedChar.stats.strength;
+            charDexterity.textContent = selectedChar.stats.dexterity;
+            charIntelligence.textContent = selectedChar.stats.intelligence;
+            characterIsSelected = true;
+            startRpgBtn.textContent = 'Spiel fortsetzen';
+        } else {
+            // Fallback to default placeholder and base RPG stats if no character is selected
+            portraitEl.src = '/images/Chat/placeholder.svg';
+            nameEl.textContent = 'Charakter';
+            charStrength.textContent = rpgData.strength || 0;
+            charDexterity.textContent = rpgData.dexterity || 0;
+            charIntelligence.textContent = rpgData.intelligence || 0;
+            characterIsSelected = false;
+            startRpgBtn.textContent = 'RPG starten';
+        }
     }
 
     // --- Authentication ---
@@ -200,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('user data', (data) => {
         updateResourceDisplay(data.resources);
         updateGameList(data.unlockedGames);
-        updateCharacterSheet(data.rpg);
+        updateCharacterSheet(data); // Pass the whole data object
     });
 
     // --- Logout ---
@@ -327,7 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startRpgBtn.addEventListener('click', () => {
-        window.open('/games/rpg/index.html', '_blank');
+        const url = characterIsSelected ? '/games/rpg/index.html?action=continue' : '/games/rpg/index.html';
+        window.open(url, '_blank');
     });
 
     if (adminPanelBtn) {
@@ -493,20 +520,26 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Received character data:', charData);
 
             const portraitEl = document.getElementById('char-portrait');
+            const nameEl = document.getElementById('char-name');
+
             if (portraitEl) {
                 portraitEl.src = charData.image;
             }
-
-            // Also update the stats display
-            if (charData.name) {
-                // Maybe a new element for character name is needed? For now, let's log it.
-                console.log(`Selected character name: ${charData.name}`);
+            if (nameEl && charData.name) {
+                nameEl.textContent = charData.name;
             }
             if (charData.stats) {
                 charStrength.textContent = charData.stats.strength;
                 charDexterity.textContent = charData.stats.dexterity;
                 charIntelligence.textContent = charData.stats.intelligence;
             }
+
+            // Set state for direct game start
+            characterIsSelected = true;
+            startRpgBtn.textContent = 'Spiel fortsetzen';
+
+            // Also save the character data to the server
+            socket.emit('character:save', charData);
         }
     });
 });

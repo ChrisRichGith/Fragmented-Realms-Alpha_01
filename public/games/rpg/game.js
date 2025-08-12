@@ -45,6 +45,9 @@ let customCharState = {
     minStat: 1
 };
 
+// Naming modal state
+let namingContext = null;
+
 
 // Initialize game
 function init() {
@@ -90,6 +93,12 @@ function init() {
         confirmCharBtn: document.getElementById('confirm-char-btn'),
         cancelCharBtn: document.getElementById('cancel-char-btn'),
         attributeButtons: document.querySelectorAll('.btn-attribute'),
+
+        // Naming Modal
+        nameCharModal: document.getElementById('name-char-modal'),
+        predefCharNameInput: document.getElementById('predef-char-name-input'),
+        confirmPredefNameBtn: document.getElementById('confirm-predef-name-btn'),
+        cancelPredefNameBtn: document.getElementById('cancel-predef-name-btn'),
     };
     
     // Set canvas size
@@ -99,12 +108,17 @@ function init() {
     // Set up event listeners
     setupEventListeners();
     
-    // Show title screen
-    showScreen('title');
-
     // Populate character creation screen
     populateCharacterCreation();
     
+    // Check for direct start action
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'continue') {
+        showScreen('game');
+    } else {
+        showScreen('title');
+    }
+
     // Start game loop (paused until game starts)
     gameLoop = requestAnimationFrame(update);
 }
@@ -165,6 +179,10 @@ function setupEventListeners() {
     ui.attributeButtons.forEach(button => {
         button.addEventListener('click', handleAttributeChange);
     });
+
+    // Naming Modal Listeners
+    ui.cancelPredefNameBtn.addEventListener('click', closeNameCharModal);
+    ui.confirmPredefNameBtn.addEventListener('click', handleConfirmPredefName);
 }
 
 // Show a specific screen
@@ -293,31 +311,75 @@ function handleConfirmCustomChar() {
     ui.startGameBtn.disabled = false;
 }
 
+// --- Naming Modal Functions ---
+function openNameCharModal(classData, card) {
+    namingContext = { classData, card };
+    ui.predefCharNameInput.value = '';
+    ui.nameCharModal.style.display = 'flex';
+    ui.predefCharNameInput.focus();
+}
+
+function closeNameCharModal() {
+    namingContext = null;
+    ui.nameCharModal.style.display = 'none';
+}
+
+function handleConfirmPredefName() {
+    const charName = ui.predefCharNameInput.value.trim();
+    if (charName.length < 3) {
+        alert('Bitte gib einen Namen mit mindestens 3 Zeichen ein.');
+        return;
+    }
+
+    if (!namingContext) return;
+
+    const { classData, card } = namingContext;
+    const charData = {
+        name: charName,
+        image: classData.img[card.dataset.gender],
+        stats: classData.stats
+    };
+
+    if (window.opener) {
+        window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+    } else {
+        alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
+    }
+
+    closeNameCharModal();
+}
+
+
 function populateCharacterCreation() {
     const classes = [
         {
             name: 'Krieger',
             description: 'Stark und widerstandsfähig, ein Meister des Nahkampfes.',
+            stats: { strength: 8, dexterity: 4, intelligence: 3 },
             img: { male: '/images/RPG/Krieger.png', female: '/images/RPG/Kriegerin.png' }
         },
         {
             name: 'Magier',
             description: 'Beherrscht die arkanen Künste, um Feinde aus der Ferne zu vernichten.',
+            stats: { strength: 2, dexterity: 5, intelligence: 8 },
             img: { male: '/images/RPG/Magier.png', female: '/images/RPG/Magierin.png' }
         },
         {
             name: 'Schurke',
             description: 'Ein listiger Kämpfer, der aus den Schatten zuschlägt.',
+            stats: { strength: 4, dexterity: 8, intelligence: 3 },
             img: { male: '/images/RPG/Schurke.png', female: '/images/RPG/Schurkin.png' }
         },
         {
             name: 'Bogenschütze',
             description: 'Ein Meisterschütze mit Pfeil und Bogen.',
+            stats: { strength: 4, dexterity: 8, intelligence: 3 },
             img: { male: '/images/RPG/Archer.png', female: '/images/RPG/Archerin.png' }
         },
         {
             name: 'Heiler',
             description: 'Ein heiliger Kleriker, der Verbündete heilt und schützt.',
+            stats: { strength: 3, dexterity: 4, intelligence: 8 },
             img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' }
         },
         {
@@ -339,10 +401,22 @@ function populateCharacterCreation() {
             card.dataset.iscustom = 'true';
         }
 
+        let statsHtml = '';
+        if (classData.stats) {
+            statsHtml = `
+                <div class="card-stats">
+                    <span>STÄ: ${classData.stats.strength}</span>
+                    <span>GES: ${classData.stats.dexterity}</span>
+                    <span>INT: ${classData.stats.intelligence}</span>
+                </div>
+            `;
+        }
+
         card.innerHTML = `
             <img src="${classData.img.male}" alt="${classData.name}">
             <h3>${classData.name}</h3>
             <p>${classData.description}</p>
+            ${statsHtml}
             <div class="gender-selector">
                 <button class="gender-btn active" data-gender="male">Männlich</button>
                 <button class="gender-btn" data-gender="female">Weiblich</button>
@@ -383,31 +457,27 @@ function populateCharacterCreation() {
         applyBtn.addEventListener('click', (event) => {
             event.stopPropagation();
 
-            let charData;
             if (classData.isCustom) {
+                // For custom characters, confirmation happens inside the modal.
+                // This button acts as a final "send to main screen" after confirmation.
                 if (!customCharState.name) {
-                    alert('Bitte erstelle zuerst deinen Charakter im Modal.');
-                    openCustomCharModal();
+                    alert('Bitte erstelle zuerst deinen Charakter über das Modal.');
+                    openCustomCharModal(); // Re-open if they haven't confirmed
                     return;
                 }
-                charData = {
+                const charData = {
                     name: customCharState.name,
-                    image: card.querySelector('img').src, // Use current src to account for secret classes
+                    image: card.querySelector('img').src,
                     stats: customCharState.stats
                 };
+                if (window.opener) {
+                    window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+                } else {
+                    alert('Hauptfenster nicht gefunden.');
+                }
             } else {
-                charData = {
-                    name: classData.name,
-                    image: classData.img[card.dataset.gender],
-                    stats: { strength: 5, dexterity: 5, intelligence: 5 } // Default stats
-                };
-            }
-
-            if (window.opener) {
-                window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
-                // window.close(); // Removed as per user request
-            } else {
-                alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
+                // For predefined classes, open the naming modal.
+                openNameCharModal(classData, card);
             }
         });
 

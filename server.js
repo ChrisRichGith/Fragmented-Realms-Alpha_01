@@ -31,7 +31,8 @@ function emitUserData(socketOrUsername, user) {
     const payload = {
         resources: user.resources,
         unlockedGames: user.unlockedGames,
-        rpg: user.rpg
+        rpg: user.rpg,
+        selectedCharacter: user.selectedCharacter
     };
 
     const targetSocketId = typeof socketOrUsername === 'string'
@@ -372,6 +373,17 @@ io.on('connection', (socket) => {
 
         emitUserData(socket, updatedUser);
         socket.emit('character:level-up-success', { newLevel: newRpgStats.level });
+    });
+
+    socket.on('character:save', async (charData) => {
+        if (socket.username) {
+            try {
+                await db.updateUser(socket.username, { selectedCharacter: charData });
+                console.log(`Saved character for ${socket.username}:`, charData.name);
+            } catch (error) {
+                console.error(`Failed to save character for ${socket.username}:`, error);
+            }
+        }
     });
 });
 

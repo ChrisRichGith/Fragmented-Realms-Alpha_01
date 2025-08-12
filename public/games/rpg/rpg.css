@@ -457,3 +457,16 @@ input[type=range]::-moz-range-thumb {
     background-color: #f5eacb; /* Lighter gold */
     box-shadow: 0 0 10px rgba(245, 234, 203, 0.5);
 }
+
+.card-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 8px 0;
+    margin-top: 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #c5b8a0;
+}
