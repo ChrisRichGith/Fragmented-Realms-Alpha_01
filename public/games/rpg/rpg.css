@@ -5,7 +5,7 @@ body, html {
     padding: 0;
     overflow: hidden;
     background-color: #1a1a2e; /* Fallback color */
-    background-image: url('/images/Background_Spiel.png');
+    background-image: url('/images/RPG/Background_Spiel.png');
     background-size: cover;
     background-position: center;
     color: white;
@@ -264,4 +264,39 @@ input[type=range]::-moz-range-thumb {
 .character-card p {
     font-size: 0.9em;
     color: #d5c5a5;
+    flex-grow: 1; /* This will make the p tag take up available space, pushing the selector down */
+}
+
+.gender-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 15px; /* Give it some space from the description */
+}
+
+.gender-btn {
+    background-color: #4a2c2a;
+    color: #c5b8a0; /* A bit duller than main text for non-active */
+    border: 1px solid #8a6d4f; /* Dull gold */
+    border-radius: 5px;
+    padding: 5px 15px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.gender-btn:hover {
+    background-color: #6d4c41;
+    color: #f5eacb;
+    border-color: #c9b037;
+}
+
+.gender-btn.active {
+    background-color: #6d4c41;
+    color: #fff;
+    border-color: #f5eacb; /* Bright gold for active */
+    box-shadow: 0 0 8px rgba(245, 234, 203, 0.3);
+    text-shadow: 0 0 5px #000;
 }
