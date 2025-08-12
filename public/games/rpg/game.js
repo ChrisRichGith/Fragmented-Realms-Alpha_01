@@ -45,6 +45,9 @@ let customCharState = {
     minStat: 1
 };
 
+// Naming modal state
+let namingContext = null;
+
 
 // Initialize game
 function init() {
@@ -90,6 +93,12 @@ function init() {
         confirmCharBtn: document.getElementById('confirm-char-btn'),
         cancelCharBtn: document.getElementById('cancel-char-btn'),
         attributeButtons: document.querySelectorAll('.btn-attribute'),
+
+        // Naming Modal
+        nameCharModal: document.getElementById('name-char-modal'),
+        predefCharNameInput: document.getElementById('predef-char-name-input'),
+        confirmPredefNameBtn: document.getElementById('confirm-predef-name-btn'),
+        cancelPredefNameBtn: document.getElementById('cancel-predef-name-btn'),
     };
     
     // Set canvas size
@@ -165,6 +174,10 @@ function setupEventListeners() {
     ui.attributeButtons.forEach(button => {
         button.addEventListener('click', handleAttributeChange);
     });
+
+    // Naming Modal Listeners
+    ui.cancelPredefNameBtn.addEventListener('click', closeNameCharModal);
+    ui.confirmPredefNameBtn.addEventListener('click', handleConfirmPredefName);
 }
 
 // Show a specific screen
@@ -293,6 +306,45 @@ function handleConfirmCustomChar() {
     ui.startGameBtn.disabled = false;
 }
 
+// --- Naming Modal Functions ---
+function openNameCharModal(classData, card) {
+    namingContext = { classData, card };
+    ui.predefCharNameInput.value = '';
+    ui.nameCharModal.style.display = 'flex';
+    ui.predefCharNameInput.focus();
+}
+
+function closeNameCharModal() {
+    namingContext = null;
+    ui.nameCharModal.style.display = 'none';
+}
+
+function handleConfirmPredefName() {
+    const charName = ui.predefCharNameInput.value.trim();
+    if (charName.length < 3) {
+        alert('Bitte gib einen Namen mit mindestens 3 Zeichen ein.');
+        return;
+    }
+
+    if (!namingContext) return;
+
+    const { classData, card } = namingContext;
+    const charData = {
+        name: charName,
+        image: classData.img[card.dataset.gender],
+        stats: { strength: 5, dexterity: 5, intelligence: 5 } // Default stats
+    };
+
+    if (window.opener) {
+        window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+    } else {
+        alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
+    }
+
+    closeNameCharModal();
+}
+
+
 function populateCharacterCreation() {
     const classes = [
         {
@@ -383,31 +435,27 @@ function populateCharacterCreation() {
         applyBtn.addEventListener('click', (event) => {
             event.stopPropagation();
 
-            let charData;
             if (classData.isCustom) {
+                // For custom characters, confirmation happens inside the modal.
+                // This button acts as a final "send to main screen" after confirmation.
                 if (!customCharState.name) {
-                    alert('Bitte erstelle zuerst deinen Charakter im Modal.');
-                    openCustomCharModal();
+                    alert('Bitte erstelle zuerst deinen Charakter über das Modal.');
+                    openCustomCharModal(); // Re-open if they haven't confirmed
                     return;
                 }
-                charData = {
+                const charData = {
                     name: customCharState.name,
-                    image: card.querySelector('img').src, // Use current src to account for secret classes
+                    image: card.querySelector('img').src,
                     stats: customCharState.stats
                 };
+                if (window.opener) {
+                    window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+                } else {
+                    alert('Hauptfenster nicht gefunden.');
+                }
             } else {
-                charData = {
-                    name: classData.name,
-                    image: classData.img[card.dataset.gender],
-                    stats: { strength: 5, dexterity: 5, intelligence: 5 } // Default stats
-                };
-            }
-
-            if (window.opener) {
-                window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
-                // window.close(); // Removed as per user request
-            } else {
-                alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
+                // For predefined classes, open the naming modal.
+                openNameCharModal(classData, card);
             }
         });
 

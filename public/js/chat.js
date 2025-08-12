@@ -123,14 +123,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateCharacterSheet(rpgData) {
+    function updateCharacterSheet(userData) {
+        if (!userData) return;
         charSheet.style.display = 'block';
-        const data = rpgData || {};
-        charLevel.textContent = data.level || 1;
-        charXP.textContent = data.xp || 0;
-        charStrength.textContent = data.strength || 0;
-        charDexterity.textContent = data.dexterity || 0;
-        charIntelligence.textContent = data.intelligence || 0;
+
+        const rpgData = userData.rpg || {};
+        const selectedChar = userData.selectedCharacter;
+
+        // Update level and XP from base RPG stats
+        charLevel.textContent = rpgData.level || 1;
+        charXP.textContent = rpgData.xp || 0;
+
+        // Update portrait, name, and stats from the selected character if it exists
+        const portraitEl = document.getElementById('char-portrait');
+        const nameEl = document.getElementById('char-name');
+
+        if (selectedChar) {
+            portraitEl.src = selectedChar.image;
+            nameEl.textContent = selectedChar.name;
+            charStrength.textContent = selectedChar.stats.strength;
+            charDexterity.textContent = selectedChar.stats.dexterity;
+            charIntelligence.textContent = selectedChar.stats.intelligence;
+        } else {
+            // Fallback to default placeholder and base RPG stats if no character is selected
+            portraitEl.src = '/images/Chat/placeholder.svg';
+            nameEl.textContent = 'Charakter';
+            charStrength.textContent = rpgData.strength || 0;
+            charDexterity.textContent = rpgData.dexterity || 0;
+            charIntelligence.textContent = rpgData.intelligence || 0;
+        }
     }
 
     // --- Authentication ---
@@ -200,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('user data', (data) => {
         updateResourceDisplay(data.resources);
         updateGameList(data.unlockedGames);
-        updateCharacterSheet(data.rpg);
+        updateCharacterSheet(data); // Pass the whole data object
     });
 
     // --- Logout ---
@@ -499,14 +520,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Also update the stats display
             if (charData.name) {
-                // Maybe a new element for character name is needed? For now, let's log it.
-                console.log(`Selected character name: ${charData.name}`);
+                document.getElementById('char-name').textContent = charData.name;
             }
             if (charData.stats) {
                 charStrength.textContent = charData.stats.strength;
                 charDexterity.textContent = charData.stats.dexterity;
                 charIntelligence.textContent = charData.stats.intelligence;
             }
+
+            // Also save the character data to the server
+            socket.emit('character:save', charData);
         }
     });
 });
