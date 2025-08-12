@@ -156,34 +156,80 @@ function showScreen(screenId) {
 }
 
 function populateCharacterCreation() {
-    const characters = [
-        { name: 'Krieger', img: '/images/Krieger.png', description: 'Ein Meister des Nahkampfes, stark und widerstandsfähig.' },
-        { name: 'Kriegerin', img: '/images/Kriegerin.png', description: 'Eine Meisterin des Nahkampfes, stark und widerstandsfähig.' },
-        { name: 'Magier', img: '/images/Magier.png', description: 'Ein mächtiger Zauberer, der die arkanen Künste beherrscht.' },
-        { name: 'Schurke', img: '/images/Schurke.png', description: 'Ein listiger Dieb, der aus den Schatten zuschlägt.' },
-        { name: 'Ranger', img: '/images/Ranger.png', description: 'Ein geschickter Jäger, der mit Pfeil und Bogen umgehen kann.' },
-        { name: 'Arkaner Komponist', img: '/images/Arkaner Komponist.png', description: 'Ein seltener Barde, der Musik und Magie vereint.' }
+    const classes = [
+        {
+            name: 'Krieger',
+            description: 'Stark und widerstandsfähig, ein Meister des Nahkampfes.',
+            img: { male: '/images/RPG/Krieger.png', female: '/images/RPG/Kriegerin.png' }
+        },
+        {
+            name: 'Magier',
+            description: 'Beherrscht die arkanen Künste, um Feinde aus der Ferne zu vernichten.',
+            img: { male: '/images/RPG/Magier.png', female: '/images/RPG/Magierin.png' }
+        },
+        {
+            name: 'Schurke',
+            description: 'Ein listiger Kämpfer, der aus den Schatten zuschlägt.',
+            img: { male: '/images/RPG/Schurke.png', female: '/images/RPG/Schurkin.png' }
+        },
+        {
+            name: 'Bogenschütze',
+            description: 'Ein Meisterschütze mit Pfeil und Bogen.',
+            img: { male: '/images/RPG/Archer.png', female: '/images/RPG/Archerin.png' }
+        },
+        {
+            name: 'Heiler',
+            description: 'Ein heiliger Kleriker, der Verbündete heilt und schützt.',
+            img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' }
+        }
     ];
 
     const container = document.getElementById('character-cards-container');
-    container.innerHTML = '';
+    container.innerHTML = ''; // Clear previous cards
 
-    characters.forEach(char => {
+    classes.forEach(classData => {
         const card = document.createElement('div');
         card.className = 'character-card';
+        // Set default gender to male
+        card.dataset.gender = 'male';
+
         card.innerHTML = `
-            <img src="${char.img}" alt="${char.name}">
-            <h3>${char.name}</h3>
-            <p>${char.description}</p>
+            <img src="${classData.img.male}" alt="${classData.name}">
+            <h3>${classData.name}</h3>
+            <p>${classData.description}</p>
+            <div class="gender-selector">
+                <button class="gender-btn active" data-gender="male">Männlich</button>
+                <button class="gender-btn" data-gender="female">Weiblich</button>
+            </div>
         `;
 
+        // Event listener for selecting the class card
         card.addEventListener('click', () => {
-            // Remove 'selected' class from all cards
             document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
-            // Add 'selected' class to the clicked card
             card.classList.add('selected');
             ui.startGameBtn.disabled = false;
         });
+
+        // Event listeners for gender selection buttons
+        const genderButtons = card.querySelectorAll('.gender-btn');
+        genderButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent card selection when clicking gender
+
+                // Get the selected gender
+                const selectedGender = button.dataset.gender;
+                card.dataset.gender = selectedGender; // Store selected gender on the card
+
+                // Update button styles
+                card.querySelector('.gender-btn.active').classList.remove('active');
+                button.classList.add('active');
+
+                // Update image source
+                const imgElement = card.querySelector('img');
+                imgElement.src = classData.img[selectedGender];
+            });
+        });
+
         container.appendChild(card);
     });
 }
