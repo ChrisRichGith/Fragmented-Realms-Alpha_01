@@ -480,8 +480,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     window.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'game:score') {
+        if (!event.data) return;
+
+        // Handle score submissions from games
+        if (event.data.type === 'game:score') {
             socket.emit('game:submit-score', event.data.payload);
+        }
+
+        // Handle character selection from RPG
+        if (event.data.type === 'character-selected') {
+            const charData = event.data.data;
+            console.log('Received character data:', charData);
+
+            const portraitEl = document.getElementById('char-portrait');
+            if (portraitEl) {
+                portraitEl.src = charData.image;
+            }
+
+            // Also update the stats display
+            if (charData.name) {
+                // Maybe a new element for character name is needed? For now, let's log it.
+                console.log(`Selected character name: ${charData.name}`);
+            }
+            if (charData.stats) {
+                charStrength.textContent = charData.stats.strength;
+                charDexterity.textContent = charData.stats.dexterity;
+                charIntelligence.textContent = charData.stats.intelligence;
+            }
         }
     });
 });
