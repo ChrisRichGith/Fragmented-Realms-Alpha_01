@@ -199,7 +199,7 @@ input[type=range]::-moz-range-thumb {
     flex-direction: column;
     align-items: center;
     width: 90%;
-    max-width: 1200px; /* Wider for character cards */
+    max-width: 1450px; /* Wider for character cards */
 }
 
 #character-creation-screen h2 {
@@ -300,4 +300,140 @@ input[type=range]::-moz-range-thumb {
     border-color: #f5eacb; /* Bright gold for active */
     box-shadow: 0 0 8px rgba(245, 234, 203, 0.3);
     text-shadow: 0 0 5px #000;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #4a2c2a; /* Dark wood color */
+    padding: 30px;
+    border: 2px solid #c9b037; /* Gold border */
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+    width: 90%;
+    max-width: 500px;
+    color: #f5eacb;
+    font-family: 'Cinzel', serif;
+}
+
+.modal-content h2 {
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px #000;
+}
+
+.modal-section {
+    margin-bottom: 20px;
+}
+
+.modal-section h3 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #c9b037;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.modal-section label {
+    font-size: 1.1em;
+}
+
+#char-name-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-top: 5px;
+    background: #f5eacb;
+    border: 1px solid #c9b037;
+    border-radius: 5px;
+    color: #4a2c2a;
+    font-family: 'Cinzel', serif;
+}
+
+.attribute-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.attribute-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.attribute-control input {
+    width: 50px;
+    text-align: center;
+    background: #f5eacb;
+    border: 1px solid #c9b037;
+    border-radius: 5px;
+    color: #4a2c2a;
+    font-family: sans-serif; /* Use a more readable font for numbers */
+    font-weight: bold;
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.attribute-control input::-webkit-outer-spin-button,
+.attribute-control input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.btn-attribute {
+    width: 30px;
+    height: 30px;
+    background-color: #6d4c41;
+    color: #f5eacb;
+    border: 1px solid #c9b037;
+    border-radius: 50%;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 4px; /* Align '-' sign better */
+}
+
+.btn-attribute:hover {
+    background-color: #8a6d4f;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.modal-buttons button {
+    background-color: #6d4c41;
+    color: #f5eacb;
+    border: 1px solid #c9b037;
+    padding: 10px 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 5px;
+}
+
+.modal-buttons button:hover {
+    background-color: #8a6d4f;
+    border-color: #f5eacb;
 }

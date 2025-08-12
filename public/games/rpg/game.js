@@ -24,6 +24,16 @@ let gameState = {
     playerName: 'Player'
 };
 
+// Custom character state
+let customCharState = {
+    name: '',
+    stats: { strength: 5, dexterity: 5, intelligence: 5 },
+    points: 0, // Start with 0 points, stats are at default
+    basePoints: 15,
+    minStat: 1
+};
+
+
 // Initialize game
 function init() {
     // Set up canvas
@@ -52,11 +62,22 @@ function init() {
         experienceEl: document.getElementById('experience'),
         healthEl: document.getElementById('health'),
 
-    // Audio
-    bgMusic: document.getElementById('bg-music'),
-    sfxClick: document.getElementById('sfx-click'),
-    musicVolumeSlider: document.getElementById('music-volume'),
-    sfxVolumeSlider: document.getElementById('sfx-volume'),
+        // Audio
+        bgMusic: document.getElementById('bg-music'),
+        sfxClick: document.getElementById('sfx-click'),
+        musicVolumeSlider: document.getElementById('music-volume'),
+        sfxVolumeSlider: document.getElementById('sfx-volume'),
+
+        // Custom Char Modal
+        customCharModal: document.getElementById('custom-char-modal'),
+        charNameInput: document.getElementById('char-name-input'),
+        pointsRemainingEl: document.getElementById('points-remaining'),
+        strengthInput: document.getElementById('strength-input'),
+        dexterityInput: document.getElementById('dexterity-input'),
+        intelligenceInput: document.getElementById('intelligence-input'),
+        confirmCharBtn: document.getElementById('confirm-char-btn'),
+        cancelCharBtn: document.getElementById('cancel-char-btn'),
+        attributeButtons: document.querySelectorAll('.btn-attribute'),
     };
     
     // Set canvas size
@@ -125,6 +146,13 @@ function setupEventListeners() {
     ui.sfxVolumeSlider.addEventListener('input', (e) => {
         if(ui.sfxClick) ui.sfxClick.volume = e.target.value / 100;
     });
+
+    // Custom Char Modal Listeners
+    ui.cancelCharBtn.addEventListener('click', closeCustomCharModal);
+    ui.confirmCharBtn.addEventListener('click', handleConfirmCustomChar);
+    ui.attributeButtons.forEach(button => {
+        button.addEventListener('click', handleAttributeChange);
+    });
 }
 
 // Show a specific screen
@@ -155,6 +183,83 @@ function showScreen(screenId) {
     }
 }
 
+
+// --- Custom Character Modal Functions ---
+function openCustomCharModal() {
+    // Reset to a clean state for point-buy
+    customCharState.stats = { strength: 1, dexterity: 1, intelligence: 1 };
+    customCharState.points = 12; // Total 15, 3 are spent on min 1 for each
+    customCharState.name = '';
+    ui.charNameInput.value = '';
+    updateCustomCharModalUI();
+    ui.customCharModal.style.display = 'flex';
+}
+
+function closeCustomCharModal() {
+    ui.customCharModal.style.display = 'none';
+}
+
+function updateCustomCharModalUI() {
+    ui.pointsRemainingEl.textContent = customCharState.points;
+    ui.strengthInput.value = customCharState.stats.strength;
+    ui.dexterityInput.value = customCharState.stats.dexterity;
+    ui.intelligenceInput.value = customCharState.stats.intelligence;
+
+    const noPointsLeft = customCharState.points <= 0;
+    ui.attributeButtons.forEach(btn => {
+        const action = btn.dataset.action;
+        const stat = btn.dataset.stat;
+        if (action === 'plus') {
+            btn.disabled = noPointsLeft;
+        } else if (action === 'minus') {
+            btn.disabled = customCharState.stats[stat] <= customCharState.minStat;
+        }
+    });
+
+    ui.confirmCharBtn.disabled = customCharState.points > 0;
+}
+
+function handleAttributeChange(event) {
+    const action = event.target.dataset.action;
+    const stat = event.target.dataset.stat;
+
+    if (action === 'plus' && customCharState.points > 0) {
+        customCharState.stats[stat]++;
+        customCharState.points--;
+    } else if (action === 'minus' && customCharState.stats[stat] > customCharState.minStat) {
+        customCharState.stats[stat]--;
+        customCharState.points++;
+    }
+    updateCustomCharModalUI();
+}
+
+function handleConfirmCustomChar() {
+    const charName = ui.charNameInput.value.trim();
+    if (charName.length < 3) {
+        alert('Bitte gib einen Namen mit mindestens 3 Zeichen ein.');
+        return;
+    }
+    if (customCharState.points > 0) {
+        alert('Bitte verteile alle Attributspunkte.');
+        return;
+    }
+
+    customCharState.name = charName;
+    console.log('Custom character created:', customCharState);
+
+    const customCard = document.querySelector('.character-card[data-iscustom="true"]');
+    if (customCard) {
+        customCard.querySelector('h3').textContent = customCharState.name;
+        customCard.querySelectorAll('.gender-btn').forEach(btn => btn.disabled = true);
+
+        document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+        customCard.classList.add('selected');
+    }
+
+    closeCustomCharModal();
+    ui.startGameBtn.disabled = false;
+}
+
 function populateCharacterCreation() {
     const classes = [
         {
@@ -181,6 +286,12 @@ function populateCharacterCreation() {
             name: 'Heiler',
             description: 'Ein heiliger Kleriker, der Verbündete heilt und schützt.',
             img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' }
+        },
+        {
+            name: 'Eigener Charakter',
+            description: 'Erstelle einen Charakter mit frei verteilbaren Attributpunkten.',
+            isCustom: true,
+            img: { male: '/images/RPG/male_silhouette.svg', female: '/images/RPG/female_silhouette.svg' }
         }
     ];
 
@@ -190,8 +301,10 @@ function populateCharacterCreation() {
     classes.forEach(classData => {
         const card = document.createElement('div');
         card.className = 'character-card';
-        // Set default gender to male
         card.dataset.gender = 'male';
+        if (classData.isCustom) {
+            card.dataset.iscustom = 'true';
+        }
 
         card.innerHTML = `
             <img src="${classData.img.male}" alt="${classData.name}">
@@ -205,9 +318,13 @@ function populateCharacterCreation() {
 
         // Event listener for selecting the class card
         card.addEventListener('click', () => {
-            document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            ui.startGameBtn.disabled = false;
+            if (classData.isCustom) {
+                openCustomCharModal();
+            } else {
+                document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                ui.startGameBtn.disabled = false;
+            }
         });
 
         // Event listeners for gender selection buttons
@@ -216,15 +333,12 @@ function populateCharacterCreation() {
             button.addEventListener('click', (event) => {
                 event.stopPropagation(); // Prevent card selection when clicking gender
 
-                // Get the selected gender
                 const selectedGender = button.dataset.gender;
-                card.dataset.gender = selectedGender; // Store selected gender on the card
+                card.dataset.gender = selectedGender;
 
-                // Update button styles
                 card.querySelector('.gender-btn.active').classList.remove('active');
                 button.classList.add('active');
 
-                // Update image source
                 const imgElement = card.querySelector('img');
                 imgElement.src = classData.img[selectedGender];
             });
