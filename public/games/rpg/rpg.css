@@ -437,3 +437,23 @@ input[type=range]::-moz-range-thumb {
     background-color: #8a6d4f;
     border-color: #f5eacb;
 }
+
+.btn-apply-char {
+    background-color: #c9b037; /* Gold color */
+    color: #4a2c2a; /* Dark wood color for text */
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    margin-top: 15px;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-apply-char:hover {
+    background-color: #f5eacb; /* Lighter gold */
+    box-shadow: 0 0 10px rgba(245, 234, 203, 0.5);
+}

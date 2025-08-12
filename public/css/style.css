@@ -7,7 +7,7 @@
 }
 
 body {
-    background: url('/images/Background_Spiel.png') no-repeat center center fixed;
+    background: url('/images/Chat/Background_Spiel.png') no-repeat center center fixed;
     background-size: cover;
     height: 100vh;
     color: #fff;
@@ -572,6 +572,17 @@ header {
 
 .danger-btn:hover {
     background-color: #ff3333 !important;
+}
+
+.char-portrait {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 20%; /* Shifts the image up to show more of the head */
+    margin: 10px auto;
+    border: 3px solid #8a6dff;
+    background-color: #2c2a3e;
 }
 
 /* Scrollbar */

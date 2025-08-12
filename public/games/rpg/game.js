@@ -347,6 +347,7 @@ function populateCharacterCreation() {
                 <button class="gender-btn active" data-gender="male">Männlich</button>
                 <button class="gender-btn" data-gender="female">Weiblich</button>
             </div>
+            <button class="btn-apply-char">Übernehmen</button>
         `;
 
         // Event listener for selecting the class card
@@ -375,6 +376,39 @@ function populateCharacterCreation() {
                 const imgElement = card.querySelector('img');
                 imgElement.src = classData.img[selectedGender];
             });
+        });
+
+        // Event listener for the apply button
+        const applyBtn = card.querySelector('.btn-apply-char');
+        applyBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+
+            let charData;
+            if (classData.isCustom) {
+                if (!customCharState.name) {
+                    alert('Bitte erstelle zuerst deinen Charakter im Modal.');
+                    openCustomCharModal();
+                    return;
+                }
+                charData = {
+                    name: customCharState.name,
+                    image: card.querySelector('img').src, // Use current src to account for secret classes
+                    stats: customCharState.stats
+                };
+            } else {
+                charData = {
+                    name: classData.name,
+                    image: classData.img[card.dataset.gender],
+                    stats: { strength: 5, dexterity: 5, intelligence: 5 } // Default stats
+                };
+            }
+
+            if (window.opener) {
+                window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+                // window.close(); // Removed as per user request
+            } else {
+                alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
+            }
         });
 
         container.appendChild(card);
