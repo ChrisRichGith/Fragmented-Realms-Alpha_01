@@ -7,59 +7,59 @@ const NPC_CLASSES = {
 };
 
 const LOCATIONS = {
-    'location_1': {
-        name: 'Location 1',
-        coords: { top: '10%', left: '10%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'city_1': {
+        name: 'City 1',
+        coords: { top: '16.63%', left: '32.41%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
     },
-    'location_2': {
-        name: 'Location 2',
-        coords: { top: '20%', left: '20%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'village_2': {
+        name: 'Village 2',
+        coords: { top: '38.44%', left: '25.37%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
     },
-    'location_3': {
-        name: 'Location 3',
-        coords: { top: '30%', left: '30%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'village_3': {
+        name: 'Village 3',
+        coords: { top: '48.76%', left: '35.45%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
     },
-    'location_4': {
-        name: 'Location 4',
-        coords: { top: '40%', left: '40%', width: '8%', height: '8%' },
+    'forest_4': {
+        name: 'Forest 4',
+        coords: { top: '29.48%', left: '48.12%', width: '8%', height: '8%' },
         detailMap: null,
-        actions: []
+        actions: ['explore', 'gather']
     },
-    'location_5': {
-        name: 'Location 5',
-        coords: { top: '50%', left: '50%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'village_5': {
+        name: 'Village 5',
+        coords: { top: '65.37%', left: '23.81%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
     },
-    'location_6': {
-        name: 'Location 6',
-        coords: { top: '60%', left: '60%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'city_6': {
+        name: 'City 6',
+        coords: { top: '66.31%', left: '39.30%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
     },
-    'location_7': {
-        name: 'Location 7',
-        coords: { top: '70%', left: '70%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'city_7': {
+        name: 'City 7',
+        coords: { top: '55.76%', left: '91.99%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
     },
-    'location_8': {
-        name: 'Location 8',
-        coords: { top: '80%', left: '80%', width: '8%', height: '8%' },
+    'dungeon_8': {
+        name: 'Dungeon 8',
+        coords: { top: '68.84%', left: '65.02%', width: '8%', height: '8%' },
         detailMap: null,
-        actions: []
+        actions: ['enter_dungeon']
     },
-    'location_9': {
-        name: 'Location 9',
-        coords: { top: '15%', left: '80%', width: '8%', height: '8%' },
-        detailMap: null,
-        actions: []
+    'village_9': {
+        name: 'Village 9',
+        coords: { top: '26.16%', left: '70.51%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
     }
 };
 
@@ -182,8 +182,6 @@ function setupEventListeners() {
     // Game controls
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', dragEnd);
     
     // UI Buttons
     const buttons = document.querySelectorAll('button');
@@ -344,15 +342,9 @@ function createLocationOverlays() {
         overlay.dataset.locationId = locationId;
         overlay.title = location.name; // Show name on hover
 
-        overlay.addEventListener('click', (e) => {
-            if (isDragging) {
-                isDragging = false;
-                return;
-            }
+        overlay.addEventListener('click', () => {
             showLocationDetail(locationId);
         });
-
-        overlay.addEventListener('mousedown', dragStart);
 
         overlayContainer.appendChild(overlay);
     }
@@ -386,52 +378,32 @@ function showLocationDetail(locationId) {
     });
 }
 
-let activeOverlay = null;
-let offsetX = 0;
-let offsetY = 0;
-let isDragging = false;
+function showLocationDetail(locationId) {
+    const location = LOCATIONS[locationId];
+    if (!location) return;
 
-function dragStart(e) {
-    isDragging = false;
-    activeOverlay = e.target;
-    offsetX = e.clientX - activeOverlay.getBoundingClientRect().left;
-    offsetY = e.clientY - activeOverlay.getBoundingClientRect().top;
-    activeOverlay.classList.add('dragging');
-}
+    showScreen('location-detail');
 
-function drag(e) {
-    if (!activeOverlay) return;
-    isDragging = true;
-    e.preventDefault();
-    const parentRect = activeOverlay.parentElement.getBoundingClientRect();
-    const x = e.clientX - parentRect.left - offsetX;
-    const y = e.clientY - parentRect.top - offsetY;
-    activeOverlay.style.left = `${x}px`;
-    activeOverlay.style.top = `${y}px`;
-}
+    const locationName = document.getElementById('location-name');
+    const detailMap = document.getElementById('location-detail-map');
+    const actionsContainer = document.getElementById('location-actions');
 
-function dragEnd(e) {
-    if (!activeOverlay) return;
+    locationName.textContent = location.name;
 
-    const overlayContainer = document.getElementById('location-overlay-container');
-    const containerRect = overlayContainer.getBoundingClientRect();
-    const overlayRect = activeOverlay.getBoundingClientRect();
+    if (location.detailMap) {
+        detailMap.src = location.detailMap;
+        detailMap.style.display = 'block';
+    } else {
+        detailMap.style.display = 'none';
+    }
 
-    const top = ((overlayRect.top - containerRect.top) / containerRect.height) * 100;
-    const left = ((overlayRect.left - containerRect.left) / containerRect.width) * 100;
-
-    const locationId = activeOverlay.dataset.locationId;
-    const locationName = LOCATIONS[locationId].name;
-
-    // Update the in-memory LOCATIONS object
-    LOCATIONS[locationId].coords.top = `${top.toFixed(2)}%`;
-    LOCATIONS[locationId].coords.left = `${left.toFixed(2)}%`;
-
-    const display = document.getElementById('coordinate-display');
-    display.innerHTML = `<strong>${locationName}:</strong><br>top: '${top.toFixed(2)}%', left: '${left.toFixed(2)}%'`;
-
-    activeOverlay.classList.remove('dragging');
-    activeOverlay = null;
+    actionsContainer.innerHTML = '';
+    location.actions.forEach(action => {
+        const actionButton = document.createElement('button');
+        actionButton.className = 'action-btn';
+        actionButton.textContent = action.replace('_', ' ');
+        actionsContainer.appendChild(actionButton);
+    });
 }
 
 
