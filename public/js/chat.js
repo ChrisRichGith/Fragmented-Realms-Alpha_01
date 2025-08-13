@@ -226,6 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateResourceDisplay(data.resources);
         updateGameList(data.unlockedGames);
         updateCharacterSheet(data); // Pass the whole data object
+
+        if (data.selectedCharacter) {
+            localStorage.setItem('selectedCharacter', JSON.stringify(data.selectedCharacter));
+        } else {
+            localStorage.removeItem('selectedCharacter');
+        }
     });
 
     // --- Logout ---
@@ -512,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle character selection from RPG
         if (event.data.type === 'character-selected') {
             const charData = event.data.data;
+            localStorage.setItem('selectedCharacter', JSON.stringify(charData));
             console.log('Received character data:', charData);
 
             const portraitEl = document.getElementById('char-portrait');

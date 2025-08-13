@@ -271,7 +271,6 @@ function handleConfirmCustomChar() {
     }
 
     customCharState.name = charName;
-    localStorage.setItem('selectedCharacter', JSON.stringify(customCharState));
     console.log('Custom character created:', customCharState);
 
     const customCard = document.querySelector('.character-card[data-iscustom="true"]');
@@ -336,8 +335,6 @@ function handleConfirmPredefName() {
         image: classData.img[card.dataset.gender],
         stats: classData.stats
     };
-
-    localStorage.setItem('selectedCharacter', JSON.stringify(charData));
 
     if (window.opener) {
         window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
