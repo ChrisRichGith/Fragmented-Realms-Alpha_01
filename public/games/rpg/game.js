@@ -71,6 +71,7 @@ function init() {
         optionsBackBtn: document.getElementById('options-back-btn'),
         creationBackBtn: document.getElementById('creation-back-btn'),
         startGameBtn: document.getElementById('start-game-btn'),
+        startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -161,6 +162,7 @@ function setupEventListeners() {
     ui.optionsBackBtn.addEventListener('click', () => showScreen('title'));
     ui.creationBackBtn.addEventListener('click', () => showScreen('title'));
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
+    ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.exitBtn.addEventListener('click', () => {
         window.close();
     });
@@ -650,7 +652,11 @@ function resetGame() {
 
 function handleKeyDown(e) {
     keys[e.key] = true;
-    if (e.key === 'Escape') window.close();
+    if (e.key === 'Escape') {
+        if (ui.gameScreen.style.display === 'block') {
+            showScreen('title');
+        }
+    }
 }
 
 function handleKeyUp(e) {
