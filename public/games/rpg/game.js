@@ -93,6 +93,9 @@ let customCharState = {
 // Naming modal state
 let namingContext = null;
 
+// Party state
+let npcParty = [null, null, null];
+
 
 // Initialize game
 function init() {
@@ -115,6 +118,7 @@ function init() {
         startGameBtn: document.getElementById('start-game-btn'),
         startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
         backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
+        savePartyBtn: document.getElementById('save-party-btn'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -203,6 +207,13 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => showScreen('game'));
+    ui.savePartyBtn.addEventListener('click', () => {
+        const charData = JSON.parse(localStorage.getItem('selectedCharacter'));
+        if (window.opener) {
+            window.opener.postMessage({ type: 'party:save', payload: { character: charData, party: npcParty } }, '*');
+        }
+        alert('Party gespeichert!');
+    });
     ui.exitBtn.addEventListener('click', () => {
         window.close();
     });
@@ -297,8 +308,11 @@ function setupNpcSelection() {
             options += `<option value="${className}">${className}</option>`;
         }
 
+        const savedNpc = npcParty[i];
+        const imgSrc = savedNpc ? NPC_CLASSES[savedNpc.className].img[savedNpc.gender] : '/images/RPG/male_silhouette.svg';
+
         card.innerHTML = `
-            <img src="/images/RPG/male_silhouette.svg" alt="NPC ${i + 1}">
+            <img src="${imgSrc}" alt="NPC ${i + 1}">
             <div class="npc-card-details">
                 <h4>Begleiter ${i + 1}</h4>
                 <select class="npc-class-select" data-slot="${i}">
@@ -307,21 +321,27 @@ function setupNpcSelection() {
             </div>
         `;
         npcContainer.appendChild(card);
+
+        if (savedNpc) {
+            card.querySelector('.npc-class-select').value = savedNpc.className;
+        }
     }
 
     const npcSelects = document.querySelectorAll('.npc-class-select');
     npcSelects.forEach(select => {
         select.addEventListener('change', (event) => {
             const selectedClass = event.target.value;
-            const slot = event.target.dataset.slot;
+            const slot = parseInt(event.target.dataset.slot, 10);
             const card = event.target.closest('.npc-card');
             const img = card.querySelector('img');
 
             if (selectedClass && NPC_CLASSES[selectedClass]) {
                 // For now, let's assume a default gender, e.g., 'male'
                 img.src = NPC_CLASSES[selectedClass].img.male;
+                npcParty[slot] = { className: selectedClass, gender: 'male' }; // Save selection
             } else {
                 img.src = '/images/RPG/male_silhouette.svg';
+                npcParty[slot] = null; // Clear selection
             }
         });
     });
@@ -343,6 +363,7 @@ function createLocationOverlays() {
         overlay.title = location.name; // Show name on hover
 
         overlay.addEventListener('click', () => {
+            playClickSound();
             showLocationDetail(locationId);
         });
 

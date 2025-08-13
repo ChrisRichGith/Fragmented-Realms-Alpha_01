@@ -385,6 +385,25 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on('party:save', async (payload) => {
+        if (socket.username) {
+            try {
+                const user = db.findUserByUsername(socket.username);
+                if (user && user.rpg) {
+                    const newRpgData = { ...user.rpg, party: payload.party };
+                    await db.updateUser(socket.username, { rpg: newRpgData, selectedCharacter: payload.character });
+                    console.log(`Saved party for ${socket.username}`);
+
+                    // Optional: send updated data back to user
+                    const updatedUser = db.findUserByUsername(socket.username);
+                    emitUserData(socket, updatedUser);
+                }
+            } catch (error) {
+                console.error(`Failed to save party for ${socket.username}:`, error);
+            }
+        }
+    });
 });
 
 // --- Automatic Resource Generation ---
