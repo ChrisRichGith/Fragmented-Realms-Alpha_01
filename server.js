@@ -34,28 +34,39 @@ if (!fs.existsSync(savesDir)) {
 
 // POST: Save a game
 app.post('/api/gamesaves', (req, res) => {
-    const { name, character, party, location } = req.body;
-
-    if (!name || !character) {
-        return res.status(400).json({ message: 'Invalid save data.' });
-    }
-
-    // Sanitize filename
-    const safeName = name.replace(/[^a-zA-Z0-9_ -]/g, '').trim();
-    if (safeName.length < 1) {
-        return res.status(400).json({ message: 'Invalid save name.' });
-    }
-
-    const filePath = path.join(savesDir, `${safeName}.json`);
-    const dataToSave = { character, party, location, savedAt: new Date().toISOString() };
-
-    fs.writeFile(filePath, JSON.stringify(dataToSave, null, 2), (err) => {
-        if (err) {
-            console.error('Error saving game:', err);
-            return res.status(500).json({ message: 'Error saving game file.' });
+    try {
+        if (!req.body) {
+            console.error('[API /api/gamesaves] Error: Request body is missing. body-parser may not be configured correctly.');
+            return res.status(400).json({ message: 'Request body is missing.' });
         }
-        res.status(201).json({ message: 'Game saved successfully.' });
-    });
+
+        const { name, character, party, location } = req.body;
+
+        if (!name || !character) {
+            return res.status(400).json({ message: 'Invalid save data. "name" and "character" properties are required.' });
+        }
+
+        // Sanitize filename
+        const safeName = name.replace(/[^a-zA-Z0-9_ -]/g, '').trim();
+        if (safeName.length < 1) {
+            return res.status(400).json({ message: 'Invalid save name.' });
+        }
+
+        const filePath = path.join(savesDir, `${safeName}.json`);
+        const dataToSave = { character, party, location, savedAt: new Date().toISOString() };
+
+        fs.writeFile(filePath, JSON.stringify(dataToSave, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing save file:', err);
+                return res.status(500).json({ message: 'Error writing game file to disk.' });
+            }
+            res.status(201).json({ message: 'Game saved successfully.' });
+        });
+
+    } catch (error) {
+        console.error('[API /api/gamesaves] A critical error occurred:', error);
+        res.status(500).json({ message: 'A critical server error occurred during save.', error: error.message });
+    }
 });
 
 // GET: List all save games
