@@ -101,6 +101,12 @@ app.get('/api/gamesaves/:name', (req, res) => {
     });
 });
 
+// GET: Ping for testing server reloads
+app.get('/ping', (req, res) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.status(200).send('Pong! If you see this, the server is running the latest code.');
+});
+
 // --- Helper to send full user data ---
 function emitUserData(socketOrUsername, user) {
     if (!user) return; // Safety check
