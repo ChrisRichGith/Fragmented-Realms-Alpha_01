@@ -6,6 +6,63 @@ const NPC_CLASSES = {
     'Heiler': { img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' } }
 };
 
+const LOCATIONS = {
+    'city_1': {
+        name: 'City 1',
+        coords: { top: '16.63%', left: '32.41%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
+    },
+    'village_2': {
+        name: 'Village 2',
+        coords: { top: '38.44%', left: '25.37%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
+    },
+    'village_3': {
+        name: 'Village 3',
+        coords: { top: '48.76%', left: '35.45%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
+    },
+    'forest_4': {
+        name: 'Forest 4',
+        coords: { top: '29.48%', left: '48.12%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: ['explore', 'gather']
+    },
+    'village_5': {
+        name: 'Village 5',
+        coords: { top: '65.37%', left: '23.81%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
+    },
+    'city_6': {
+        name: 'City 6',
+        coords: { top: '66.31%', left: '39.30%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
+    },
+    'city_7': {
+        name: 'City 7',
+        coords: { top: '55.76%', left: '91.99%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
+    },
+    'dungeon_8': {
+        name: 'Dungeon 8',
+        coords: { top: '68.84%', left: '65.02%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: ['enter_dungeon']
+    },
+    'village_9': {
+        name: 'Village 9',
+        coords: { top: '26.16%', left: '70.51%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
+    }
+};
+
 const SECRET_CLASSES = [
     {
         name: 'Arkaner Komponist',
@@ -57,6 +114,7 @@ function init() {
         creationBackBtn: document.getElementById('creation-back-btn'),
         startGameBtn: document.getElementById('start-game-btn'),
         startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
+        backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -144,6 +202,7 @@ function setupEventListeners() {
     ui.creationBackBtn.addEventListener('click', () => showScreen('title'));
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
+    ui.backToWorldMapBtn.addEventListener('click', () => showScreen('game'));
     ui.exitBtn.addEventListener('click', () => {
         window.close();
     });
@@ -194,6 +253,9 @@ function showScreen(screenId) {
             if (ui.gameScreen) ui.gameScreen.style.display = 'flex';
             setupGameScreen();
             break;
+        case 'location-detail':
+            if (ui.locationDetailScreen) ui.locationDetailScreen.style.display = 'flex';
+            break;
     }
 }
 
@@ -219,6 +281,7 @@ function setupGameScreen() {
     `;
 
     setupNpcSelection();
+    createLocationOverlays();
 }
 
 function setupNpcSelection() {
@@ -263,6 +326,86 @@ function setupNpcSelection() {
         });
     });
 }
+
+function createLocationOverlays() {
+    const overlayContainer = document.getElementById('location-overlay-container');
+    overlayContainer.innerHTML = '';
+
+    for (const locationId in LOCATIONS) {
+        const location = LOCATIONS[locationId];
+        const overlay = document.createElement('div');
+        overlay.className = 'location-overlay';
+        overlay.style.top = location.coords.top;
+        overlay.style.left = location.coords.left;
+        overlay.style.width = location.coords.width;
+        overlay.style.height = location.coords.height;
+        overlay.dataset.locationId = locationId;
+        overlay.title = location.name; // Show name on hover
+
+        overlay.addEventListener('click', () => {
+            showLocationDetail(locationId);
+        });
+
+        overlayContainer.appendChild(overlay);
+    }
+}
+
+function showLocationDetail(locationId) {
+    const location = LOCATIONS[locationId];
+    if (!location) return;
+
+    showScreen('location-detail'); // A new case for showScreen
+
+    const locationName = document.getElementById('location-name');
+    const detailMap = document.getElementById('location-detail-map');
+    const actionsContainer = document.getElementById('location-actions');
+
+    locationName.textContent = location.name;
+
+    if (location.detailMap) {
+        detailMap.src = location.detailMap;
+        detailMap.style.display = 'block';
+    } else {
+        detailMap.style.display = 'none';
+    }
+
+    actionsContainer.innerHTML = '';
+    location.actions.forEach(action => {
+        const actionButton = document.createElement('button');
+        actionButton.className = 'action-btn';
+        actionButton.textContent = action.replace('_', ' ');
+        actionsContainer.appendChild(actionButton);
+    });
+}
+
+function showLocationDetail(locationId) {
+    const location = LOCATIONS[locationId];
+    if (!location) return;
+
+    showScreen('location-detail');
+
+    const locationName = document.getElementById('location-name');
+    const detailMap = document.getElementById('location-detail-map');
+    const actionsContainer = document.getElementById('location-actions');
+
+    locationName.textContent = location.name;
+
+    if (location.detailMap) {
+        detailMap.src = location.detailMap;
+        detailMap.style.display = 'block';
+    } else {
+        detailMap.style.display = 'none';
+    }
+
+    actionsContainer.innerHTML = '';
+    location.actions.forEach(action => {
+        const actionButton = document.createElement('button');
+        actionButton.className = 'action-btn';
+        actionButton.textContent = action.replace('_', ' ');
+        actionsContainer.appendChild(actionButton);
+    });
+}
+
 
 // --- Custom Character Modal Functions ---
 function openCustomCharModal() {
