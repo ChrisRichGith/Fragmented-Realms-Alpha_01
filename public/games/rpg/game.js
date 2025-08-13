@@ -362,8 +362,9 @@ function dragStart(e) {
 function drag(e) {
     if (!activeOverlay) return;
     e.preventDefault();
-    const x = e.clientX - offsetX;
-    const y = e.clientY - offsetY;
+    const parentRect = activeOverlay.parentElement.getBoundingClientRect();
+    const x = e.clientX - parentRect.left - offsetX;
+    const y = e.clientY - parentRect.top - offsetY;
     activeOverlay.style.left = `${x}px`;
     activeOverlay.style.top = `${y}px`;
 }
