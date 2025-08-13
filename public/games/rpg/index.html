@@ -58,12 +58,25 @@
 
         <!-- Game Screen (initially hidden) -->
         <div id="game-screen" style="display: none;">
+            <div id="coordinate-display"></div>
             <div id="npc-selection-container">
                 <!-- NPC cards will be injected here -->
             </div>
             <div id="game-character-card-container">
                 <!-- Character card will be injected here -->
             </div>
+            <div id="world-map-container">
+                <img id="world-map" src="/images/RPG/Worldmap.png" alt="World Map">
+                <div id="location-overlay-container"></div>
+            </div>
+        </div>
+
+        <!-- Location Detail Screen (initially hidden) -->
+        <div id="location-detail-screen" style="display: none;">
+            <h2 id="location-name"></h2>
+            <img id="location-detail-map" src="" alt="Location Map">
+            <div id="location-actions"></div>
+            <button id="back-to-world-map-btn">Zurück zur Weltkarte</button>
         </div>
     </div>
 

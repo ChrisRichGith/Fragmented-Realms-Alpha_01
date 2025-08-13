@@ -6,6 +6,27 @@ const NPC_CLASSES = {
     'Heiler': { img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' } }
 };
 
+const LOCATIONS = {
+    'eldoria': {
+        name: 'City of Eldoria',
+        coords: { top: '30%', left: '40%', width: '10%', height: '10%' },
+        detailMap: '/images/RPG/Citymap.png',
+        actions: ['trade', 'quest', 'rest']
+    },
+    'greenhaven': {
+        name: 'Greenhaven Village',
+        coords: { top: '60%', left: '60%', width: '8%', height: '8%' },
+        detailMap: '/images/RPG/Villagemap.png',
+        actions: ['quest', 'rest']
+    },
+    'dark_dungeon': {
+        name: 'Dark Dungeon',
+        coords: { top: '15%', left: '70%', width: '8%', height: '8%' },
+        detailMap: null, // No detail map for a dungeon, maybe a different kind of view
+        actions: ['enter_dungeon']
+    }
+};
+
 const SECRET_CLASSES = [
     {
         name: 'Arkaner Komponist',
@@ -57,6 +78,7 @@ function init() {
         creationBackBtn: document.getElementById('creation-back-btn'),
         startGameBtn: document.getElementById('start-game-btn'),
         startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
+        backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -124,6 +146,8 @@ function setupEventListeners() {
     // Game controls
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
     
     // UI Buttons
     const buttons = document.querySelectorAll('button');
@@ -144,6 +168,7 @@ function setupEventListeners() {
     ui.creationBackBtn.addEventListener('click', () => showScreen('title'));
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
+    ui.backToWorldMapBtn.addEventListener('click', () => showScreen('game'));
     ui.exitBtn.addEventListener('click', () => {
         window.close();
     });
@@ -194,6 +219,9 @@ function showScreen(screenId) {
             if (ui.gameScreen) ui.gameScreen.style.display = 'flex';
             setupGameScreen();
             break;
+        case 'location-detail':
+            if (ui.locationDetailScreen) ui.locationDetailScreen.style.display = 'flex';
+            break;
     }
 }
 
@@ -219,6 +247,7 @@ function setupGameScreen() {
     `;
 
     setupNpcSelection();
+    createLocationOverlays();
 }
 
 function setupNpcSelection() {
@@ -263,6 +292,102 @@ function setupNpcSelection() {
         });
     });
 }
+
+function createLocationOverlays() {
+    const overlayContainer = document.getElementById('location-overlay-container');
+    overlayContainer.innerHTML = '';
+
+    for (const locationId in LOCATIONS) {
+        const location = LOCATIONS[locationId];
+        const overlay = document.createElement('div');
+        overlay.className = 'location-overlay';
+        overlay.style.top = location.coords.top;
+        overlay.style.left = location.coords.left;
+        overlay.style.width = location.coords.width;
+        overlay.style.height = location.coords.height;
+        overlay.dataset.locationId = locationId;
+        overlay.title = location.name; // Show name on hover
+
+        overlay.addEventListener('click', (e) => {
+            // Prevent click from firing during drag
+            if (e.target === activeOverlay) return;
+            showLocationDetail(locationId);
+        });
+
+        overlay.addEventListener('mousedown', dragStart);
+
+        overlayContainer.appendChild(overlay);
+    }
+}
+
+function showLocationDetail(locationId) {
+    const location = LOCATIONS[locationId];
+    if (!location) return;
+
+    showScreen('location-detail'); // A new case for showScreen
+
+    const locationName = document.getElementById('location-name');
+    const detailMap = document.getElementById('location-detail-map');
+    const actionsContainer = document.getElementById('location-actions');
+
+    locationName.textContent = location.name;
+
+    if (location.detailMap) {
+        detailMap.src = location.detailMap;
+        detailMap.style.display = 'block';
+    } else {
+        detailMap.style.display = 'none';
+    }
+
+    actionsContainer.innerHTML = '';
+    location.actions.forEach(action => {
+        const actionButton = document.createElement('button');
+        actionButton.className = 'action-btn';
+        actionButton.textContent = action.replace('_', ' ');
+        actionsContainer.appendChild(actionButton);
+    });
+}
+
+let activeOverlay = null;
+let offsetX = 0;
+let offsetY = 0;
+
+function dragStart(e) {
+    activeOverlay = e.target;
+    offsetX = e.clientX - activeOverlay.getBoundingClientRect().left;
+    offsetY = e.clientY - activeOverlay.getBoundingClientRect().top;
+    activeOverlay.classList.add('dragging');
+}
+
+function drag(e) {
+    if (!activeOverlay) return;
+    e.preventDefault();
+    const x = e.clientX - offsetX;
+    const y = e.clientY - offsetY;
+    activeOverlay.style.left = `${x}px`;
+    activeOverlay.style.top = `${y}px`;
+}
+
+function dragEnd(e) {
+    if (!activeOverlay) return;
+
+    const overlayContainer = document.getElementById('location-overlay-container');
+    const containerRect = overlayContainer.getBoundingClientRect();
+    const overlayRect = activeOverlay.getBoundingClientRect();
+
+    const top = ((overlayRect.top - containerRect.top) / containerRect.height) * 100;
+    const left = ((overlayRect.left - containerRect.left) / containerRect.width) * 100;
+
+    const locationId = activeOverlay.dataset.locationId;
+    const locationName = LOCATIONS[locationId].name;
+
+    const display = document.getElementById('coordinate-display');
+    display.innerHTML = `<strong>${locationName}:</strong><br>top: '${top.toFixed(2)}%', left: '${left.toFixed(2)}%'`;
+
+    activeOverlay.classList.remove('dragging');
+    activeOverlay = null;
+}
+
 
 // --- Custom Character Modal Functions ---
 function openCustomCharModal() {

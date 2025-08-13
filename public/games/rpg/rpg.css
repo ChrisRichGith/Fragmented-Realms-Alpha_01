@@ -556,3 +556,52 @@ input[type=range]::-moz-range-thumb {
     padding: 5px;
     font-family: 'Cinzel', serif;
 }
+
+#world-map-container {
+    position: relative; /* Needed for absolute positioning of children */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#location-overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.location-overlay {
+    position: absolute;
+    background: rgba(255, 215, 0, 0.2); /* Faint gold highlight */
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.location-overlay:hover {
+    background: rgba(255, 215, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.8);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#coordinate-display {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #c9b037;
+    font-family: monospace;
+    z-index: 1001; /* Ensure it's on top */
+}
+
+.location-overlay.dragging {
+    cursor: grabbing;
+    background: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+}
