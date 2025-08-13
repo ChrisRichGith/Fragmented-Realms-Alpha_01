@@ -12,7 +12,8 @@
         <div id="title-screen">
             <img src="/images/RPG/Logo.png" alt="Game Logo" id="game-logo">
             <div class="menu-buttons">
-                <button id="new-game-btn">Neues Spiel</button>
+                <button id="new-game-btn">Charakter erstellen</button>
+                <button id="start-game-direkt-btn">Spiel starten</button>
                 <button id="load-game-btn">Spiel fortsetzen</button>
                 <button id="options-btn">Optionen</button>
                 <button id="exit-rpg-btn">Zurück zum Hauptmenü</button>
@@ -57,12 +58,24 @@
 
         <!-- Game Screen (initially hidden) -->
         <div id="game-screen" style="display: none;">
-            <canvas id="gameCanvas"></canvas>
-            <div id="rpg-ui">
-                <p id="level">Level: 1</p>
-                <p id="experience">Erfahrung: 0/100</p>
-                <p id="health">Leben: 100/100</p>
+            <div id="npc-selection-container">
+                <!-- NPC cards will be injected here -->
             </div>
+            <div id="game-character-card-container">
+                <!-- Character card will be injected here -->
+            </div>
+            <div id="world-map-container">
+                <img id="world-map" src="/images/RPG/Worldmap.png" alt="World Map">
+                <div id="location-overlay-container"></div>
+            </div>
+        </div>
+
+        <!-- Location Detail Screen (initially hidden) -->
+        <div id="location-detail-screen" style="display: none;">
+            <h2 id="location-name"></h2>
+            <img id="location-detail-map" src="" alt="Location Map">
+            <div id="location-actions"></div>
+            <button id="back-to-world-map-btn">Zurück zur Weltkarte</button>
         </div>
     </div>
 

@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const charStrength = document.getElementById('charStrength');
     const charDexterity = document.getElementById('charDexterity');
     const charIntelligence = document.getElementById('charIntelligence');
-    const levelUpBtn = document.getElementById('levelUpBtn');
     const startRpgBtn = document.getElementById('startRpgBtn');
 
 
@@ -227,6 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateResourceDisplay(data.resources);
         updateGameList(data.unlockedGames);
         updateCharacterSheet(data); // Pass the whole data object
+
+        if (data.selectedCharacter) {
+            localStorage.setItem('selectedCharacter', JSON.stringify(data.selectedCharacter));
+        } else {
+            localStorage.removeItem('selectedCharacter');
+        }
     });
 
     // --- Logout ---
@@ -346,10 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 socket.emit('game:unlock', gameId);
             }
         }
-    });
-
-    levelUpBtn.addEventListener('click', () => {
-        socket.emit('character:level-up');
     });
 
     startRpgBtn.addEventListener('click', () => {
@@ -517,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle character selection from RPG
         if (event.data.type === 'character-selected') {
             const charData = event.data.data;
+            localStorage.setItem('selectedCharacter', JSON.stringify(charData));
             console.log('Received character data:', charData);
 
             const portraitEl = document.getElementById('char-portrait');
