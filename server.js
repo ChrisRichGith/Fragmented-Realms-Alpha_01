@@ -23,8 +23,8 @@ const io = socketIo(server);
 const connectedUsers = new Map(); // Stores username -> socket.id
 
 // Middleware
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json()); // To parse JSON bodies
+app.use(express.static(path.join(__dirname, 'public')));
 
 // --- File-based Save/Load for RPG ---
 const savesDir = path.join(__dirname, 'gamesaves');
