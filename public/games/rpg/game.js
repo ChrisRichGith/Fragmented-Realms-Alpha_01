@@ -28,7 +28,7 @@ const LOCATIONS = {
     'forest_4': {
         name: 'Forest 4',
         coords: { top: '29.48%', left: '48.12%', width: '8%', height: '8%' },
-        detailMap: null,
+        detailMap: '/images/RPG/Wald.png',
         actions: ['explore', 'gather']
     },
     'village_5': {
@@ -52,7 +52,7 @@ const LOCATIONS = {
     'dungeon_8': {
         name: 'Dungeon 8',
         coords: { top: '68.84%', left: '65.02%', width: '8%', height: '8%' },
-        detailMap: null,
+        detailMap: '/images/RPG/Dungeon.png',
         actions: ['enter_dungeon']
     },
     'village_9': {
@@ -355,34 +355,6 @@ function showLocationDetail(locationId) {
     if (!location) return;
 
     showScreen('location-detail'); // A new case for showScreen
-
-    const locationName = document.getElementById('location-name');
-    const detailMap = document.getElementById('location-detail-map');
-    const actionsContainer = document.getElementById('location-actions');
-
-    locationName.textContent = location.name;
-
-    if (location.detailMap) {
-        detailMap.src = location.detailMap;
-        detailMap.style.display = 'block';
-    } else {
-        detailMap.style.display = 'none';
-    }
-
-    actionsContainer.innerHTML = '';
-    location.actions.forEach(action => {
-        const actionButton = document.createElement('button');
-        actionButton.className = 'action-btn';
-        actionButton.textContent = action.replace('_', ' ');
-        actionsContainer.appendChild(actionButton);
-    });
-}
-
-function showLocationDetail(locationId) {
-    const location = LOCATIONS[locationId];
-    if (!location) return;
-
-    showScreen('location-detail');
 
     const locationName = document.getElementById('location-name');
     const detailMap = document.getElementById('location-detail-map');
