@@ -12,6 +12,37 @@ body, html {
     font-family: 'Cinzel', serif;
 }
 
+#save-slots-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.save-slot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #6d4c41;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #8a6d4f;
+}
+
+.save-slot-name {
+    font-size: 1.2em;
+}
+
+.save-slot button {
+    background-color: #c9b037;
+    color: #4a2c2a;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 #game-container {
     position: relative;
     width: 100vw;
@@ -585,6 +616,18 @@ input[type=range]::-moz-range-thumb {
     background: rgba(255, 215, 0, 0.4);
     border: 1px solid rgba(255, 215, 0, 0.8);
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#save-name-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-top: 5px;
+    background: #f5eacb;
+    border: 1px solid #c9b037;
+    border-radius: 5px;
+    color: #4a2c2a;
+    font-family: 'Cinzel', serif;
 }
 
 #rpg-menu-container {

@@ -157,5 +157,33 @@
             </div>
         </div>
     </div>
+
+    <!-- Save Game Modal -->
+    <div id="save-game-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Spiel speichern</h2>
+            <div class="modal-section">
+                <label for="save-name-input">Name des Spielstands:</label>
+                <input type="text" id="save-name-input" maxlength="30" placeholder="Mein Abenteuer">
+            </div>
+            <div class="modal-buttons">
+                <button id="confirm-save-btn">Speichern</button>
+                <button id="cancel-save-btn">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Game Modal -->
+    <div id="load-game-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Spiel laden</h2>
+            <div id="save-slots-container">
+                <!-- Save slots will be injected here -->
+            </div>
+            <div class="modal-buttons">
+                <button id="cancel-load-btn">Abbrechen</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

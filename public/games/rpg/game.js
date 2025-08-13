@@ -95,6 +95,7 @@ let namingContext = null;
 
 // Party state
 let npcParty = [null, null, null];
+let currentLocationId = null;
 
 
 // Initialize game
@@ -149,6 +150,17 @@ function init() {
         predefCharNameInput: document.getElementById('predef-char-name-input'),
         confirmPredefNameBtn: document.getElementById('confirm-predef-name-btn'),
         cancelPredefNameBtn: document.getElementById('cancel-predef-name-btn'),
+
+        // Save Game Modal
+        saveGameModal: document.getElementById('save-game-modal'),
+        saveNameInput: document.getElementById('save-name-input'),
+        confirmSaveBtn: document.getElementById('confirm-save-btn'),
+        cancelSaveBtn: document.getElementById('cancel-save-btn'),
+
+        // Load Game Modal
+        loadGameModal: document.getElementById('load-game-modal'),
+        saveSlotsContainer: document.getElementById('save-slots-container'),
+        cancelLoadBtn: document.getElementById('cancel-load-btn'),
     };
     
     // Set up event listeners
@@ -210,11 +222,7 @@ function setupEventListeners() {
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => showScreen('game'));
     ui.savePartyBtn.addEventListener('click', () => {
-        const charData = JSON.parse(localStorage.getItem('selectedCharacter'));
-        if (window.opener) {
-            window.opener.postMessage({ type: 'party:save', payload: { character: charData, party: npcParty } }, '*');
-        }
-        alert('Party gespeichert!');
+        ui.saveGameModal.style.display = 'flex';
     });
     ui.exitBtn.addEventListener('click', () => {
         window.close();
@@ -242,6 +250,82 @@ function setupEventListeners() {
     // Naming Modal Listeners
     ui.cancelPredefNameBtn.addEventListener('click', closeNameCharModal);
     ui.confirmPredefNameBtn.addEventListener('click', handleConfirmPredefName);
+
+    // Save Game Modal Listeners
+    ui.cancelSaveBtn.addEventListener('click', () => {
+        ui.saveGameModal.style.display = 'none';
+    });
+
+    ui.loadGameBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/gamesaves');
+            if (!response.ok) {
+                throw new Error('Failed to fetch save games.');
+            }
+            const saveFiles = await response.json();
+
+            ui.saveSlotsContainer.innerHTML = ''; // Clear previous slots
+
+            if (saveFiles.length === 0) {
+                ui.saveSlotsContainer.innerHTML = '<p>No save games found.</p>';
+            } else {
+                saveFiles.forEach(fileName => {
+                    const button = document.createElement('button');
+                    button.textContent = fileName.replace('.json', '');
+                    button.classList.add('save-slot-btn');
+                    button.addEventListener('click', () => loadGame(fileName));
+                    ui.saveSlotsContainer.appendChild(button);
+                });
+            }
+
+            ui.loadGameModal.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading save games:', error);
+            // Optionally, show an error message to the user
+        }
+    });
+
+    ui.cancelLoadBtn.addEventListener('click', () => {
+        ui.loadGameModal.style.display = 'none';
+    });
+    ui.confirmSaveBtn.addEventListener('click', async () => {
+        const saveName = ui.saveNameInput.value.trim();
+        if (saveName.length < 3 || !/^[a-zA-Z0-9_ -]+$/.test(saveName)) {
+             alert('Bitte gib einen gültigen Namen mit mindestens 3 Zeichen ein (nur Buchstaben, Zahlen, Leerzeichen, _ und -).');
+            return;
+        }
+
+        const charData = JSON.parse(localStorage.getItem('selectedCharacter'));
+        const saveData = {
+            name: saveName,
+            character: charData,
+            party: npcParty,
+            location: currentLocationId
+        };
+
+        try {
+            const response = await fetch('/api/gamesaves', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(saveData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to save game.');
+            }
+
+            ui.saveNameInput.value = '';
+            ui.saveGameModal.style.display = 'none';
+            alert('Spielstand gespeichert!');
+
+        } catch (error) {
+            console.error('Error saving game:', error);
+            alert(`Fehler beim Speichern: ${error.message}`);
+        }
+    });
 }
 
 // Show a specific screen
@@ -378,10 +462,11 @@ function createLocationOverlays() {
 }
 
 function showLocationDetail(locationId) {
+    currentLocationId = locationId; // Track current location
     const location = LOCATIONS[locationId];
     if (!location) return;
 
-    showScreen('location-detail'); // A new case for showScreen
+    showScreen('location-detail');
 
     const locationName = document.getElementById('location-name');
     const detailMap = document.getElementById('location-detail-map');
@@ -403,6 +488,41 @@ function showLocationDetail(locationId) {
         actionButton.textContent = action.replace('_', ' ');
         actionsContainer.appendChild(actionButton);
     });
+}
+
+async function loadGame(fileName) {
+    try {
+        // We get the filename with .json, but the API needs it without
+        const saveName = fileName.replace('.json', '');
+        const response = await fetch(`/api/gamesaves/${saveName}`);
+        if (!response.ok) {
+            throw new Error(`Failed to load game: ${saveName}`);
+        }
+        const saveData = await response.json();
+
+        // Load main character data into localStorage
+        localStorage.setItem('selectedCharacter', JSON.stringify(saveData.character));
+
+        // Load NPC party
+        npcParty = saveData.party || [null, null, null];
+
+        // Load current location
+        currentLocationId = saveData.location || null;
+
+        // Refresh the game screen with the loaded data
+        if (ui.gameScreen.style.display !== 'flex') {
+            showScreen('game');
+        } else {
+            setupGameScreen();
+        }
+
+        console.log('Game loaded successfully:', saveData);
+        ui.loadGameModal.style.display = 'none'; // Close modal on success
+
+    } catch (error) {
+        console.error('Error in loadGame:', error);
+        alert('Fehler beim Laden des Spiels.');
+    }
 }
 
 
