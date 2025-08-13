@@ -652,7 +652,11 @@ function resetGame() {
 
 function handleKeyDown(e) {
     keys[e.key] = true;
-    if (e.key === 'Escape') window.close();
+    if (e.key === 'Escape') {
+        if (ui.gameScreen.style.display === 'block') {
+            showScreen('title');
+        }
+    }
 }
 
 function handleKeyUp(e) {
