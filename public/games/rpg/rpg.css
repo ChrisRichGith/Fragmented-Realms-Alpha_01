@@ -586,3 +586,46 @@ input[type=range]::-moz-range-thumb {
     border: 1px solid rgba(255, 215, 0, 0.8);
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
+
+#rpg-menu-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1002;
+}
+
+#rpg-menu-toggle-btn {
+    width: 50px;
+    height: 50px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid #c9b037;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#rpg-menu-toggle-btn img {
+    width: 30px;
+    height: 30px;
+}
+
+#rpg-menu-popup {
+    position: absolute;
+    top: 60px; /* Below the menu button */
+    left: 0;
+    background: #4a2c2a;
+    border: 1px solid #c9b037;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+#rpg-menu-popup.hidden {
+    display: none;
+}
+
+#rpg-menu-popup button {
+    width: 100%;
+}

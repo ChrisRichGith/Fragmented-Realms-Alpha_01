@@ -119,6 +119,8 @@ function init() {
         startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
         backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
         savePartyBtn: document.getElementById('save-party-btn'),
+        rpgMenuToggleBtn: document.getElementById('rpg-menu-toggle-btn'),
+        rpgMenuPopup: document.getElementById('rpg-menu-popup'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -216,6 +218,10 @@ function setupEventListeners() {
     });
     ui.exitBtn.addEventListener('click', () => {
         window.close();
+    });
+
+    ui.rpgMenuToggleBtn.addEventListener('click', () => {
+        ui.rpgMenuPopup.classList.toggle('hidden');
     });
 
     // Volume Sliders
