@@ -45,7 +45,7 @@ const LOCATIONS = {
     },
     'city_7': {
         name: 'City 7',
-        coords: { top: '55.76%', left: '91.99%', width: '8%', height: '8%' },
+        coords: { top: '55.76%', left: '60.02%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
