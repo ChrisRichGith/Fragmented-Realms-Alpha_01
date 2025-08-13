@@ -7,23 +7,59 @@ const NPC_CLASSES = {
 };
 
 const LOCATIONS = {
-    'eldoria': {
-        name: 'City of Eldoria',
-        coords: { top: '30%', left: '40%', width: '10%', height: '10%' },
-        detailMap: '/images/RPG/Citymap.png',
-        actions: ['trade', 'quest', 'rest']
+    'location_1': {
+        name: 'Location 1',
+        coords: { top: '10%', left: '10%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
     },
-    'greenhaven': {
-        name: 'Greenhaven Village',
+    'location_2': {
+        name: 'Location 2',
+        coords: { top: '20%', left: '20%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
+    },
+    'location_3': {
+        name: 'Location 3',
+        coords: { top: '30%', left: '30%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
+    },
+    'location_4': {
+        name: 'Location 4',
+        coords: { top: '40%', left: '40%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
+    },
+    'location_5': {
+        name: 'Location 5',
+        coords: { top: '50%', left: '50%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
+    },
+    'location_6': {
+        name: 'Location 6',
         coords: { top: '60%', left: '60%', width: '8%', height: '8%' },
-        detailMap: '/images/RPG/Villagemap.png',
-        actions: ['quest', 'rest']
+        detailMap: null,
+        actions: []
     },
-    'dark_dungeon': {
-        name: 'Dark Dungeon',
-        coords: { top: '15%', left: '70%', width: '8%', height: '8%' },
-        detailMap: null, // No detail map for a dungeon, maybe a different kind of view
-        actions: ['enter_dungeon']
+    'location_7': {
+        name: 'Location 7',
+        coords: { top: '70%', left: '70%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
+    },
+    'location_8': {
+        name: 'Location 8',
+        coords: { top: '80%', left: '80%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
+    },
+    'location_9': {
+        name: 'Location 9',
+        coords: { top: '15%', left: '80%', width: '8%', height: '8%' },
+        detailMap: null,
+        actions: []
     }
 };
 
@@ -309,8 +345,10 @@ function createLocationOverlays() {
         overlay.title = location.name; // Show name on hover
 
         overlay.addEventListener('click', (e) => {
-            // Prevent click from firing during drag
-            if (e.target === activeOverlay) return;
+            if (isDragging) {
+                isDragging = false;
+                return;
+            }
             showLocationDetail(locationId);
         });
 
@@ -351,8 +389,10 @@ function showLocationDetail(locationId) {
 let activeOverlay = null;
 let offsetX = 0;
 let offsetY = 0;
+let isDragging = false;
 
 function dragStart(e) {
+    isDragging = false;
     activeOverlay = e.target;
     offsetX = e.clientX - activeOverlay.getBoundingClientRect().left;
     offsetY = e.clientY - activeOverlay.getBoundingClientRect().top;
@@ -361,6 +401,7 @@ function dragStart(e) {
 
 function drag(e) {
     if (!activeOverlay) return;
+    isDragging = true;
     e.preventDefault();
     const parentRect = activeOverlay.parentElement.getBoundingClientRect();
     const x = e.clientX - parentRect.left - offsetX;
@@ -381,6 +422,10 @@ function dragEnd(e) {
 
     const locationId = activeOverlay.dataset.locationId;
     const locationName = LOCATIONS[locationId].name;
+
+    // Update the in-memory LOCATIONS object
+    LOCATIONS[locationId].coords.top = `${top.toFixed(2)}%`;
+    LOCATIONS[locationId].coords.left = `${left.toFixed(2)}%`;
 
     const display = document.getElementById('coordinate-display');
     display.innerHTML = `<strong>${locationName}:</strong><br>top: '${top.toFixed(2)}%', left: '${left.toFixed(2)}%'`;
