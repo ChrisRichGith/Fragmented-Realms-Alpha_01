@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const charStrength = document.getElementById('charStrength');
     const charDexterity = document.getElementById('charDexterity');
     const charIntelligence = document.getElementById('charIntelligence');
-    const levelUpBtn = document.getElementById('levelUpBtn');
     const startRpgBtn = document.getElementById('startRpgBtn');
 
 
@@ -346,10 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 socket.emit('game:unlock', gameId);
             }
         }
-    });
-
-    levelUpBtn.addEventListener('click', () => {
-        socket.emit('character:level-up');
     });
 
     startRpgBtn.addEventListener('click', () => {
