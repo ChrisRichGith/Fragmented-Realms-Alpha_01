@@ -46,6 +46,7 @@ function init() {
         gameScreen: document.getElementById('game-screen'),
         optionsScreen: document.getElementById('options-screen'),
         characterCreationScreen: document.getElementById('character-creation-screen'),
+        locationDetailScreen: document.getElementById('location-detail-screen'),
 
         // Buttons
         newGameBtn: document.getElementById('new-game-btn'),
@@ -175,6 +176,7 @@ function showScreen(screenId) {
     if (ui.gameScreen) ui.gameScreen.style.display = 'none';
     if (ui.optionsScreen) ui.optionsScreen.style.display = 'none';
     if (ui.characterCreationScreen) ui.characterCreationScreen.style.display = 'none';
+    if (ui.locationDetailScreen) ui.locationDetailScreen.style.display = 'none';
     
     // Show the requested screen
     switch(screenId) {
@@ -261,7 +263,6 @@ function setupNpcSelection() {
         });
     });
 }
-
 
 // --- Custom Character Modal Functions ---
 function openCustomCharModal() {
