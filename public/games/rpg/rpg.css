@@ -78,7 +78,7 @@ body, html {
     display: none; /* Keep it hidden by default */
     width: 100%;
     height: 100%;
-    justify-content: center;
+    justify-content: space-around; /* Distribute space */
     align-items: center;
     padding: 20px;
     box-sizing: border-box;
@@ -508,4 +508,51 @@ input[type=range]::-moz-range-thumb {
     font-size: 0.8em;
     font-weight: bold;
     color: #c5b8a0;
+}
+
+#npc-selection-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-basis: 220px;
+    flex-shrink: 0;
+}
+
+.npc-card {
+    background: rgba(40, 30, 30, 0.7);
+    border: 1px solid #8a6d4f;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.npc-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #4a2c2a;
+    object-fit: cover;
+}
+
+.npc-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.npc-card-details h4 {
+    margin: 0;
+    font-size: 1.1em;
+    color: #f5eacb;
+}
+
+.npc-class-select {
+    background-color: #4a2c2a;
+    color: #f5eacb;
+    border: 1px solid #c9b037;
+    border-radius: 4px;
+    padding: 5px;
+    font-family: 'Cinzel', serif;
 }

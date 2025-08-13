@@ -1,3 +1,11 @@
+const NPC_CLASSES = {
+    'Krieger': { img: { male: '/images/RPG/Krieger.png', female: '/images/RPG/Kriegerin.png' } },
+    'Schurke': { img: { male: '/images/RPG/Schurke.png', female: '/images/RPG/Schurkin.png' } },
+    'Bogenschütze': { img: { male: '/images/RPG/Archer.png', female: '/images/RPG/Archerin.png' } },
+    'Magier': { img: { male: '/images/RPG/Magier.png', female: '/images/RPG/Magierin.png' } },
+    'Heiler': { img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' } }
+};
+
 const SECRET_CLASSES = [
     {
         name: 'Arkaner Komponist',
@@ -207,6 +215,51 @@ function setupGameScreen() {
             </div>
         </div>
     `;
+
+    setupNpcSelection();
+}
+
+function setupNpcSelection() {
+    const npcContainer = document.getElementById('npc-selection-container');
+    npcContainer.innerHTML = ''; // Clear previous content
+
+    for (let i = 0; i < 3; i++) {
+        const card = document.createElement('div');
+        card.className = 'npc-card';
+
+        let options = '<option value="">- Klasse wählen -</option>';
+        for (const className in NPC_CLASSES) {
+            options += `<option value="${className}">${className}</option>`;
+        }
+
+        card.innerHTML = `
+            <img src="/images/RPG/male_silhouette.svg" alt="NPC ${i + 1}">
+            <div class="npc-card-details">
+                <h4>Begleiter ${i + 1}</h4>
+                <select class="npc-class-select" data-slot="${i}">
+                    ${options}
+                </select>
+            </div>
+        `;
+        npcContainer.appendChild(card);
+    }
+
+    const npcSelects = document.querySelectorAll('.npc-class-select');
+    npcSelects.forEach(select => {
+        select.addEventListener('change', (event) => {
+            const selectedClass = event.target.value;
+            const slot = event.target.dataset.slot;
+            const card = event.target.closest('.npc-card');
+            const img = card.querySelector('img');
+
+            if (selectedClass && NPC_CLASSES[selectedClass]) {
+                // For now, let's assume a default gender, e.g., 'male'
+                img.src = NPC_CLASSES[selectedClass].img.male;
+            } else {
+                img.src = '/images/RPG/male_silhouette.svg';
+            }
+        });
+    });
 }
 
 
