@@ -8,55 +8,55 @@ const NPC_CLASSES = {
 
 const LOCATIONS = {
     'city_1': {
-        name: 'City 1',
+        name: 'Varethyn',
         coords: { top: '16.63%', left: '32.41%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'village_2': {
-        name: 'Village 2',
+        name: 'Dornhall',
         coords: { top: '38.44%', left: '25.37%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'village_3': {
-        name: 'Village 3',
+        name: 'Myrrgarde',
         coords: { top: '48.76%', left: '35.45%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'forest_4': {
-        name: 'Forest 4',
+        name: 'Ysmereth',
         coords: { top: '29.48%', left: '48.12%', width: '8%', height: '8%' },
-        detailMap: null,
+        detailMap: '/images/RPG/Wald.png',
         actions: ['explore', 'gather']
     },
     'village_5': {
-        name: 'Village 5',
+        name: 'Elaris',
         coords: { top: '65.37%', left: '23.81%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'city_6': {
-        name: 'City 6',
+        name: 'Bruchhain',
         coords: { top: '66.31%', left: '39.30%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'city_7': {
-        name: 'City 7',
-        coords: { top: '55.76%', left: '91.99%', width: '8%', height: '8%' },
+        name: 'Tharvok',
+        coords: { top: '55.76%', left: '60.02%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'dungeon_8': {
-        name: 'Dungeon 8',
+        name: 'Schattenfels',
         coords: { top: '68.84%', left: '65.02%', width: '8%', height: '8%' },
-        detailMap: null,
+        detailMap: '/images/RPG/Dungeon.png',
         actions: ['enter_dungeon']
     },
     'village_9': {
-        name: 'Village 9',
+        name: 'Kragmoor',
         coords: { top: '26.16%', left: '70.51%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
@@ -93,6 +93,10 @@ let customCharState = {
 // Naming modal state
 let namingContext = null;
 
+// Party state
+let npcParty = [null, null, null];
+let currentLocationId = null;
+
 
 // Initialize game
 function init() {
@@ -115,6 +119,9 @@ function init() {
         startGameBtn: document.getElementById('start-game-btn'),
         startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
         backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
+        savePartyBtn: document.getElementById('save-party-btn'),
+        rpgMenuToggleBtn: document.getElementById('rpg-menu-toggle-btn'),
+        rpgMenuPopup: document.getElementById('rpg-menu-popup'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -143,6 +150,17 @@ function init() {
         predefCharNameInput: document.getElementById('predef-char-name-input'),
         confirmPredefNameBtn: document.getElementById('confirm-predef-name-btn'),
         cancelPredefNameBtn: document.getElementById('cancel-predef-name-btn'),
+
+        // Save Game Modal
+        saveGameModal: document.getElementById('save-game-modal'),
+        saveNameInput: document.getElementById('save-name-input'),
+        confirmSaveBtn: document.getElementById('confirm-save-btn'),
+        cancelSaveBtn: document.getElementById('cancel-save-btn'),
+
+        // Load Game Modal
+        loadGameModal: document.getElementById('load-game-modal'),
+        saveSlotsContainer: document.getElementById('save-slots-container'),
+        cancelLoadBtn: document.getElementById('cancel-load-btn'),
     };
     
     // Set up event listeners
@@ -203,8 +221,15 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => showScreen('game'));
+    ui.savePartyBtn.addEventListener('click', () => {
+        ui.saveGameModal.style.display = 'flex';
+    });
     ui.exitBtn.addEventListener('click', () => {
         window.close();
+    });
+
+    ui.rpgMenuToggleBtn.addEventListener('click', () => {
+        ui.rpgMenuPopup.classList.toggle('hidden');
     });
 
     // Volume Sliders
@@ -225,6 +250,82 @@ function setupEventListeners() {
     // Naming Modal Listeners
     ui.cancelPredefNameBtn.addEventListener('click', closeNameCharModal);
     ui.confirmPredefNameBtn.addEventListener('click', handleConfirmPredefName);
+
+    // Save Game Modal Listeners
+    ui.cancelSaveBtn.addEventListener('click', () => {
+        ui.saveGameModal.style.display = 'none';
+    });
+
+    ui.loadGameBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/gamesaves');
+            if (!response.ok) {
+                throw new Error('Failed to fetch save games.');
+            }
+            const saveFiles = await response.json();
+
+            ui.saveSlotsContainer.innerHTML = ''; // Clear previous slots
+
+            if (saveFiles.length === 0) {
+                ui.saveSlotsContainer.innerHTML = '<p>No save games found.</p>';
+            } else {
+                saveFiles.forEach(fileName => {
+                    const button = document.createElement('button');
+                    button.textContent = fileName.replace('.json', '');
+                    button.classList.add('save-slot-btn');
+                    button.addEventListener('click', () => loadGame(fileName));
+                    ui.saveSlotsContainer.appendChild(button);
+                });
+            }
+
+            ui.loadGameModal.style.display = 'block';
+        } catch (error) {
+            console.error('Error loading save games:', error);
+            // Optionally, show an error message to the user
+        }
+    });
+
+    ui.cancelLoadBtn.addEventListener('click', () => {
+        ui.loadGameModal.style.display = 'none';
+    });
+    ui.confirmSaveBtn.addEventListener('click', async () => {
+        const saveName = ui.saveNameInput.value.trim();
+        if (saveName.length < 3 || !/^[a-zA-Z0-9_ -]+$/.test(saveName)) {
+             alert('Bitte gib einen gültigen Namen mit mindestens 3 Zeichen ein (nur Buchstaben, Zahlen, Leerzeichen, _ und -).');
+            return;
+        }
+
+        const charData = JSON.parse(localStorage.getItem('selectedCharacter'));
+        const saveData = {
+            name: saveName,
+            character: charData,
+            party: npcParty,
+            location: currentLocationId
+        };
+
+        try {
+            const response = await fetch('/api/gamesaves', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(saveData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to save game.');
+            }
+
+            ui.saveNameInput.value = '';
+            ui.saveGameModal.style.display = 'none';
+            alert('Spielstand gespeichert!');
+
+        } catch (error) {
+            console.error('Error saving game:', error);
+            alert(`Fehler beim Speichern: ${error.message}`);
+        }
+    });
 }
 
 // Show a specific screen
@@ -297,8 +398,11 @@ function setupNpcSelection() {
             options += `<option value="${className}">${className}</option>`;
         }
 
+        const savedNpc = npcParty[i];
+        const imgSrc = savedNpc ? NPC_CLASSES[savedNpc.className].img[savedNpc.gender] : '/images/RPG/male_silhouette.svg';
+
         card.innerHTML = `
-            <img src="/images/RPG/male_silhouette.svg" alt="NPC ${i + 1}">
+            <img src="${imgSrc}" alt="NPC ${i + 1}">
             <div class="npc-card-details">
                 <h4>Begleiter ${i + 1}</h4>
                 <select class="npc-class-select" data-slot="${i}">
@@ -307,21 +411,27 @@ function setupNpcSelection() {
             </div>
         `;
         npcContainer.appendChild(card);
+
+        if (savedNpc) {
+            card.querySelector('.npc-class-select').value = savedNpc.className;
+        }
     }
 
     const npcSelects = document.querySelectorAll('.npc-class-select');
     npcSelects.forEach(select => {
         select.addEventListener('change', (event) => {
             const selectedClass = event.target.value;
-            const slot = event.target.dataset.slot;
+            const slot = parseInt(event.target.dataset.slot, 10);
             const card = event.target.closest('.npc-card');
             const img = card.querySelector('img');
 
             if (selectedClass && NPC_CLASSES[selectedClass]) {
                 // For now, let's assume a default gender, e.g., 'male'
                 img.src = NPC_CLASSES[selectedClass].img.male;
+                npcParty[slot] = { className: selectedClass, gender: 'male' }; // Save selection
             } else {
                 img.src = '/images/RPG/male_silhouette.svg';
+                npcParty[slot] = null; // Clear selection
             }
         });
     });
@@ -343,6 +453,7 @@ function createLocationOverlays() {
         overlay.title = location.name; // Show name on hover
 
         overlay.addEventListener('click', () => {
+            playClickSound();
             showLocationDetail(locationId);
         });
 
@@ -351,34 +462,7 @@ function createLocationOverlays() {
 }
 
 function showLocationDetail(locationId) {
-    const location = LOCATIONS[locationId];
-    if (!location) return;
-
-    showScreen('location-detail'); // A new case for showScreen
-
-    const locationName = document.getElementById('location-name');
-    const detailMap = document.getElementById('location-detail-map');
-    const actionsContainer = document.getElementById('location-actions');
-
-    locationName.textContent = location.name;
-
-    if (location.detailMap) {
-        detailMap.src = location.detailMap;
-        detailMap.style.display = 'block';
-    } else {
-        detailMap.style.display = 'none';
-    }
-
-    actionsContainer.innerHTML = '';
-    location.actions.forEach(action => {
-        const actionButton = document.createElement('button');
-        actionButton.className = 'action-btn';
-        actionButton.textContent = action.replace('_', ' ');
-        actionsContainer.appendChild(actionButton);
-    });
-}
-
-function showLocationDetail(locationId) {
+    currentLocationId = locationId; // Track current location
     const location = LOCATIONS[locationId];
     if (!location) return;
 
@@ -404,6 +488,41 @@ function showLocationDetail(locationId) {
         actionButton.textContent = action.replace('_', ' ');
         actionsContainer.appendChild(actionButton);
     });
+}
+
+async function loadGame(fileName) {
+    try {
+        // We get the filename with .json, but the API needs it without
+        const saveName = fileName.replace('.json', '');
+        const response = await fetch(`/api/gamesaves/${saveName}`);
+        if (!response.ok) {
+            throw new Error(`Failed to load game: ${saveName}`);
+        }
+        const saveData = await response.json();
+
+        // Load main character data into localStorage
+        localStorage.setItem('selectedCharacter', JSON.stringify(saveData.character));
+
+        // Load NPC party
+        npcParty = saveData.party || [null, null, null];
+
+        // Load current location
+        currentLocationId = saveData.location || null;
+
+        // Refresh the game screen with the loaded data
+        if (ui.gameScreen.style.display !== 'flex') {
+            showScreen('game');
+        } else {
+            setupGameScreen();
+        }
+
+        console.log('Game loaded successfully:', saveData);
+        ui.loadGameModal.style.display = 'none'; // Close modal on success
+
+    } catch (error) {
+        console.error('Error in loadGame:', error);
+        alert('Fehler beim Laden des Spiels.');
+    }
 }
 
 

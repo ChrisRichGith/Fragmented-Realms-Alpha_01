@@ -515,6 +515,12 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('game:submit-score', event.data.payload);
         }
 
+        // Handle party save from RPG
+        if (event.data.type === 'party:save') {
+            socket.emit('party:save', event.data.payload);
+            return; // Done with this event
+        }
+
         // Handle character selection from RPG
         if (event.data.type === 'character-selected') {
             const charData = event.data.data;

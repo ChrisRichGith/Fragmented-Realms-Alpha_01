@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const fs = require('fs');
 const db = require('./db');
 const bcrypt = require('bcrypt');
 
@@ -21,8 +22,84 @@ const io = socketIo(server);
 
 const connectedUsers = new Map(); // Stores username -> socket.id
 
-// Serve static files
+// Middleware
+app.use(express.json()); // To parse JSON bodies
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- File-based Save/Load for RPG ---
+const savesDir = path.join(__dirname, 'gamesaves');
+if (!fs.existsSync(savesDir)) {
+    fs.mkdirSync(savesDir);
+}
+
+// POST: Save a game
+app.post('/api/gamesaves', (req, res) => {
+    try {
+        if (!req.body) {
+            console.error('[API /api/gamesaves] Error: Request body is missing. body-parser may not be configured correctly.');
+            return res.status(400).json({ message: 'Request body is missing.' });
+        }
+
+        const { name, character, party, location } = req.body;
+
+        if (!name || !character) {
+            return res.status(400).json({ message: 'Invalid save data. "name" and "character" properties are required.' });
+        }
+
+        // Sanitize filename
+        const safeName = name.replace(/[^a-zA-Z0-9_ -]/g, '').trim();
+        if (safeName.length < 1) {
+            return res.status(400).json({ message: 'Invalid save name.' });
+        }
+
+        const filePath = path.join(savesDir, `${safeName}.json`);
+        const dataToSave = { character, party, location, savedAt: new Date().toISOString() };
+
+        fs.writeFile(filePath, JSON.stringify(dataToSave, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing save file:', err);
+                return res.status(500).json({ message: 'Error writing game file to disk.' });
+            }
+            res.status(201).json({ message: 'Game saved successfully.' });
+        });
+
+    } catch (error) {
+        console.error('[API /api/gamesaves] A critical error occurred:', error);
+        res.status(500).json({ message: 'A critical server error occurred during save.', error: error.message });
+    }
+});
+
+// GET: List all save games
+app.get('/api/gamesaves', (req, res) => {
+    fs.readdir(savesDir, (err, files) => {
+        if (err) {
+            console.error('Error reading saves directory:', err);
+            return res.status(500).json({ message: 'Could not retrieve save games.' });
+        }
+        const jsonFiles = files.filter(file => file.endsWith('.json'));
+        res.status(200).json(jsonFiles);
+    });
+});
+
+// GET: Load a specific game
+app.get('/api/gamesaves/:name', (req, res) => {
+    const { name } = req.params;
+
+    // Sanitize filename to prevent directory traversal
+    const safeName = path.basename(name);
+    const filePath = path.join(savesDir, `${safeName}.json`);
+
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                return res.status(404).json({ message: 'Save game not found.' });
+            }
+            console.error(`Error reading save file ${safeName}.json:`, err);
+            return res.status(500).json({ message: 'Could not read save game.' });
+        }
+        res.status(200).json(JSON.parse(data));
+    });
+});
 
 // --- Helper to send full user data ---
 function emitUserData(socketOrUsername, user) {
@@ -373,6 +450,17 @@ io.on('connection', (socket) => {
 
         emitUserData(socket, updatedUser);
         socket.emit('character:level-up-success', { newLevel: newRpgStats.level });
+    });
+
+    socket.on('character:save', async (charData) => {
+        if (socket.username) {
+            try {
+                await db.updateUser(socket.username, { selectedCharacter: charData });
+                console.log(`Saved character for ${socket.username}:`, charData.name);
+            } catch (error) {
+                console.error(`Failed to save character for ${socket.username}:`, error);
+            }
+        }
     });
 
     socket.on('character:save', async (charData) => {
