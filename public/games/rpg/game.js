@@ -1,9 +1,9 @@
-// Game configuration
-const config = {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    playerSpeed: 3,
-    playerSize: 30
+const NPC_CLASSES = {
+    'Krieger': { img: { male: '/images/RPG/Krieger.png', female: '/images/RPG/Kriegerin.png' } },
+    'Schurke': { img: { male: '/images/RPG/Schurke.png', female: '/images/RPG/Schurkin.png' } },
+    'Bogenschütze': { img: { male: '/images/RPG/Archer.png', female: '/images/RPG/Archerin.png' } },
+    'Magier': { img: { male: '/images/RPG/Magier.png', female: '/images/RPG/Magierin.png' } },
+    'Heiler': { img: { male: '/images/RPG/Heiler.png', female: '/images/RPG/Heilerin.png' } }
 };
 
 const SECRET_CLASSES = [
@@ -19,22 +19,10 @@ const SECRET_CLASSES = [
 ];
 
 // Game objects
-let player, enemies = [];
-let canvas, ctx, gameLoop, keys = {};
+let keys = {};
 
 // UI Elements
 let ui = {};
-
-// Game state
-let gameState = {
-    level: 1,
-    experience: 0,
-    experienceToNext: 100,
-    health: 100,
-    maxHealth: 100,
-    isGameOver: false,
-    playerName: 'Player'
-};
 
 // Custom character state
 let customCharState = {
@@ -51,10 +39,6 @@ let namingContext = null;
 
 // Initialize game
 function init() {
-    // Set up canvas
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-
     // Populate UI object
     ui = {
         // Screens
@@ -102,10 +86,6 @@ function init() {
         cancelPredefNameBtn: document.getElementById('cancel-predef-name-btn'),
     };
     
-    // Set canvas size
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
     // Set up event listeners
     setupEventListeners();
     
@@ -121,7 +101,7 @@ function init() {
     }
 
     // Start game loop (paused until game starts)
-    gameLoop = requestAnimationFrame(update);
+    // gameLoop = requestAnimationFrame(update);
 }
 
 // Audio control functions
@@ -209,10 +189,77 @@ function showScreen(screenId) {
             if (ui.characterCreationScreen) ui.characterCreationScreen.style.display = 'flex';
             break;
         case 'game':
-            if (ui.gameScreen) ui.gameScreen.style.display = 'block';
-            resetGame();
+            if (ui.gameScreen) ui.gameScreen.style.display = 'flex';
+            setupGameScreen();
             break;
     }
+}
+
+function setupGameScreen() {
+    const charCardContainer = document.getElementById('game-character-card-container');
+    const charData = JSON.parse(localStorage.getItem('selectedCharacter'));
+
+    if (!charData) {
+        charCardContainer.innerHTML = '<p>Kein Charakter ausgewählt. Bitte erstelle einen Charakter.</p>';
+        return;
+    }
+
+    charCardContainer.innerHTML = `
+        <div class="character-card-game">
+            <img src="${charData.image}" alt="${charData.name}">
+            <h3>${charData.name}</h3>
+            <div class="card-stats">
+                <span>STÄ: ${charData.stats.strength}</span>
+                <span>GES: ${charData.stats.dexterity}</span>
+                <span>INT: ${charData.stats.intelligence}</span>
+            </div>
+        </div>
+    `;
+
+    setupNpcSelection();
+}
+
+function setupNpcSelection() {
+    const npcContainer = document.getElementById('npc-selection-container');
+    npcContainer.innerHTML = ''; // Clear previous content
+
+    for (let i = 0; i < 3; i++) {
+        const card = document.createElement('div');
+        card.className = 'npc-card';
+
+        let options = '<option value="">- Klasse wählen -</option>';
+        for (const className in NPC_CLASSES) {
+            options += `<option value="${className}">${className}</option>`;
+        }
+
+        card.innerHTML = `
+            <img src="/images/RPG/male_silhouette.svg" alt="NPC ${i + 1}">
+            <div class="npc-card-details">
+                <h4>Begleiter ${i + 1}</h4>
+                <select class="npc-class-select" data-slot="${i}">
+                    ${options}
+                </select>
+            </div>
+        `;
+        npcContainer.appendChild(card);
+    }
+
+    const npcSelects = document.querySelectorAll('.npc-class-select');
+    npcSelects.forEach(select => {
+        select.addEventListener('change', (event) => {
+            const selectedClass = event.target.value;
+            const slot = event.target.dataset.slot;
+            const card = event.target.closest('.npc-card');
+            const img = card.querySelector('img');
+
+            if (selectedClass && NPC_CLASSES[selectedClass]) {
+                // For now, let's assume a default gender, e.g., 'male'
+                img.src = NPC_CLASSES[selectedClass].img.male;
+            } else {
+                img.src = '/images/RPG/male_silhouette.svg';
+            }
+        });
+    });
 }
 
 
@@ -487,168 +534,6 @@ function populateCharacterCreation() {
     });
 }
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-// Game loop
-function update(timestamp) {
-    if (gameState.isGameOver) return;
-    
-    updatePlayer();
-    updateEnemies();
-    checkCollisions();
-    draw();
-    
-    gameLoop = requestAnimationFrame(update);
-}
-
-function draw() {
-    // Clear canvas
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw player
-    if (player) {
-        ctx.fillStyle = '#8a6dff';
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-    }
-    
-    // Draw enemies
-    enemies.forEach(enemy => {
-        ctx.fillStyle = '#ff4444';
-        ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-    });
-    
-    // Draw experience orbs
-    if (Math.random() < 0.01) {
-        const orb = {
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            width: 10,
-            height: 10
-        };
-        enemies.push(orb);
-    }
-}
-
-function updatePlayer() {
-    if (!player) return;
-    
-    // Movement
-    if (keys['ArrowLeft'] || keys['a']) {
-        player.x = Math.max(0, player.x - config.playerSpeed);
-    }
-    if (keys['ArrowRight'] || keys['d']) {
-        player.x = Math.min(canvas.width - player.width, player.x + config.playerSpeed);
-    }
-    if (keys['ArrowUp'] || keys['w']) {
-        player.y = Math.max(0, player.y - config.playerSpeed);
-    }
-    if (keys['ArrowDown'] || keys['s']) {
-        player.y = Math.min(canvas.height - player.height, player.y + config.playerSpeed);
-    }
-}
-
-function updateEnemies() {
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        
-        // Move towards player
-        if (player) {
-            const dx = player.x - enemy.x;
-            const dy = player.y - enemy.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance > 0) {
-                enemy.x += (dx / distance) * 1;
-                enemy.y += (dy / distance) * 1;
-            }
-        }
-        
-        // Remove if off screen
-        if (enemy.x < -50 || enemy.x > canvas.width + 50 || 
-            enemy.y < -50 || enemy.y > canvas.height + 50) {
-            enemies.splice(i, 1);
-        }
-    }
-}
-
-function checkCollisions() {
-    if (!player) return;
-    
-    for (let i = enemies.length - 1; i >= 0; i--) {
-        const enemy = enemies[i];
-        
-        if (isColliding(player, enemy)) {
-            // Check if it's an experience orb (smaller than enemies)
-            if (enemy.width < 20) {
-                // Experience orb
-                gameState.experience += 10;
-                if (gameState.experience >= gameState.experienceToNext) {
-                    gameState.level++;
-                    gameState.experience -= gameState.experienceToNext;
-                    gameState.experienceToNext = Math.floor(gameState.experienceToNext * 1.2);
-                    gameState.maxHealth += 10;
-                    gameState.health = gameState.maxHealth;
-                }
-                enemies.splice(i, 1);
-            } else {
-                // Enemy collision
-                gameState.health -= 10;
-                enemies.splice(i, 1);
-                
-                if (gameState.health <= 0) {
-                    gameOver();
-                }
-            }
-        }
-    }
-    
-    // Update UI
-    ui.levelEl.textContent = `Level: ${gameState.level}`;
-    ui.experienceEl.textContent = `Erfahrung: ${gameState.experience}/${gameState.experienceToNext}`;
-    ui.healthEl.textContent = `Leben: ${gameState.health}/${gameState.maxHealth}`;
-}
-
-function isColliding(obj1, obj2) {
-    return obj1.x < obj2.x + obj2.width &&
-           obj1.x + obj1.width > obj2.x &&
-           obj1.y < obj2.y + obj2.height &&
-           obj1.y + obj1.height > obj2.y;
-}
-
-function gameOver() {
-    gameState.isGameOver = true;
-    // showScreen('gameOver'); // Game over screen not implemented yet
-    console.log("Game Over!");
-}
-
-function resetGame() {
-    gameState = {
-        level: 1,
-        experience: 0,
-        experienceToNext: 100,
-        health: 100,
-        maxHealth: 100,
-        isGameOver: false
-    };
-    
-    player = {
-        x: canvas.width / 2 - config.playerSize / 2,
-        y: canvas.height / 2 - config.playerSize / 2,
-        width: config.playerSize,
-        height: config.playerSize
-    };
-    
-    enemies = [];
-    
-    if (gameLoop) {
-        cancelAnimationFrame(gameLoop);
-    }
-    gameLoop = requestAnimationFrame(update);
-}
 
 function handleKeyDown(e) {
     keys[e.key] = true;
