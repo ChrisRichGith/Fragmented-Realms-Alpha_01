@@ -161,15 +161,10 @@ body, html {
 
 #world-map-wrapper {
     position: absolute;
-    /* Centering the map */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    /* Making it a square that respects viewport height */
-    width: 80vh;
-    height: 80vh;
-    max-width: 80vw;
-    max-height: 80vw;
+    top: 80px;
+    left: 480px;
+    width: 1024px;
+    height: 780px;
     border-radius: 10px;
     border: 3px solid #c9b037;
     box-shadow: 0 0 20px rgba(0,0,0,0.7);
@@ -196,13 +191,10 @@ body, html {
 #location-detail-screen {
     /* DECKUNGSGLEICH: Make it identical to the wrapper */
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80vh;
-    height: 80vh;
-    max-width: 80vw;
-    max-height: 80vw;
+    top: 80px;
+    left: 480px;
+    width: 1024px;
+    height: 780px;
     border-radius: 10px;
     z-index: 1; /* Below the world map */
     display: none; /* Controlled by JS */
