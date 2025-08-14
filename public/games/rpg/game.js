@@ -217,7 +217,21 @@ function setupEventListeners() {
     ui.creationBackBtn.addEventListener('click', () => showScreen('title'));
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
-    ui.backToWorldMapBtn.addEventListener('click', () => showScreen('game'));
+    ui.backToWorldMapBtn.addEventListener('click', () => {
+        // Show the game screen first to have a backdrop
+        ui.gameScreen.style.display = 'flex';
+
+        // Remove the split class to trigger the closing animation
+        const mapLeft = document.getElementById('world-map-left');
+        const mapRight = document.getElementById('world-map-right');
+        mapLeft.classList.remove('split');
+        mapRight.classList.remove('split');
+
+        // After the animation, hide the location detail screen
+        setTimeout(() => {
+            ui.locationDetailScreen.style.display = 'none';
+        }, 100); // A small delay to ensure the animation starts
+    });
     ui.savePartyBtn.addEventListener('click', () => {
         ui.saveGameModal.style.display = 'flex';
     });
@@ -463,25 +477,23 @@ function createLocationOverlays() {
 }
 
 function showLocationDetail(locationId) {
-    currentLocationId = locationId; // Track current location
+    currentLocationId = locationId;
     const location = LOCATIONS[locationId];
     if (!location) return;
 
-    showScreen('location-detail');
+    // --- New Animation Logic ---
 
+    // 1. Prepare the detail screen content
     const locationName = document.getElementById('location-name');
     const detailMap = document.getElementById('location-detail-map');
     const actionsContainer = document.getElementById('location-actions');
-
     locationName.textContent = location.name;
-
     if (location.detailMap) {
         detailMap.src = location.detailMap;
         detailMap.style.display = 'block';
     } else {
         detailMap.style.display = 'none';
     }
-
     actionsContainer.innerHTML = '';
     location.actions.forEach(action => {
         const actionButton = document.createElement('button');
@@ -489,6 +501,20 @@ function showLocationDetail(locationId) {
         actionButton.textContent = action.replace('_', ' ');
         actionsContainer.appendChild(actionButton);
     });
+
+    // 2. Make the detail screen visible but keep it behind the game screen for now
+    ui.locationDetailScreen.style.display = 'flex';
+
+    // 3. Trigger the animation
+    const mapLeft = document.getElementById('world-map-left');
+    const mapRight = document.getElementById('world-map-right');
+    mapLeft.classList.add('split');
+    mapRight.classList.add('split');
+
+    // 4. After the animation, hide the game screen
+    setTimeout(() => {
+        ui.gameScreen.style.display = 'none';
+    }, 800); // Must match the transition duration in CSS
 }
 
 async function loadGame(fileName) {
