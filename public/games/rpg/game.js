@@ -9,55 +9,55 @@ const NPC_CLASSES = {
 const LOCATIONS = {
     'city_1': {
         name: 'Varethyn',
-        coords: { top: '11.01%', left: '25.81%', width: '10%', height: '15%' },
+        coords: { top: '16.63%', left: '32.41%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'village_2': {
         name: 'Dornhall',
-        coords: { top: '38.01%', left: '16.08%', width: '8%', height: '8%' },
+        coords: { top: '38.44%', left: '25.37%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'village_3': {
         name: 'Myrrgarde',
-        coords: { top: '48.49%', left: '31.2%', width: '8%', height: '8%' },
+        coords: { top: '48.76%', left: '35.45%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'forest_4': {
         name: 'Ysmereth',
-        coords: { top: '25.54%', left: '44.82%', width: '15%', height: '15%' },
+        coords: { top: '29.48%', left: '48.12%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Wald.png',
         actions: ['explore', 'gather']
     },
     'village_5': {
         name: 'Elaris',
-        coords: { top: '65.1%', left: '14.75%', width: '8%', height: '8%' },
+        coords: { top: '65.37%', left: '23.81%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'city_6': {
         name: 'Bruchhain',
-        coords: { top: '66.2%', left: '35.8%', width: '10%', height: '10%' },
+        coords: { top: '66.31%', left: '39.30%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'city_7': {
         name: 'Tharvok',
-        coords: { top: '52.58%', left: '67.17%', width: '12%', height: '13%' },
+        coords: { top: '55.76%', left: '60.02%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'dungeon_8': {
         name: 'Schattenfels',
-        coords: { top: '69.42%', left: '73.02%', width: '8%', height: '8%' },
+        coords: { top: '68.84%', left: '65.02%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Dungeon.png',
         actions: ['enter_dungeon']
     },
     'village_9': {
         name: 'Kragmoor',
-        coords: { top: '26.45%', left: '80.1%', width: '8%', height: '8%' },
+        coords: { top: '26.16%', left: '70.51%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     }
@@ -97,6 +97,7 @@ let namingContext = null;
 let npcParty = [null, null, null];
 let currentLocationId = null;
 
+
 // Initialize game
 function init() {
     // Populate UI object
@@ -120,6 +121,8 @@ function init() {
         backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
         savePartyBtn: document.getElementById('save-party-btn'),
         loadPartyBtn: document.getElementById('load-party-btn'),
+        rpgMenuToggleBtn: document.getElementById('rpg-menu-toggle-btn'),
+        rpgMenuPopup: document.getElementById('rpg-menu-popup'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -215,25 +218,26 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => {
-        // Show the game screen first to have a backdrop
-        ui.gameScreen.style.display = 'flex';
+        // Hide the detail screen content immediately
+        ui.locationDetailScreen.style.display = 'none';
 
-        // Remove the split class to trigger the closing animation
+        // Find the map halves and remove the .split class to trigger the closing animation
         const mapLeft = document.getElementById('world-map-left');
         const mapRight = document.getElementById('world-map-right');
-        mapLeft.classList.remove('split');
-        mapRight.classList.remove('split');
-
-        // After the animation, hide the location detail screen
-        setTimeout(() => {
-            ui.locationDetailScreen.style.display = 'none';
-        }, 100); // A small delay to ensure the animation starts
+        if (mapLeft && mapRight) {
+            mapLeft.classList.remove('split');
+            mapRight.classList.remove('split');
+        }
     });
     ui.savePartyBtn.addEventListener('click', () => {
         ui.saveGameModal.style.display = 'flex';
     });
     ui.exitBtn.addEventListener('click', () => {
         window.close();
+    });
+
+    ui.rpgMenuToggleBtn.addEventListener('click', () => {
+        ui.rpgMenuPopup.classList.toggle('hidden');
     });
 
     // Volume Sliders
@@ -473,8 +477,6 @@ function showLocationDetail(locationId) {
     const location = LOCATIONS[locationId];
     if (!location) return;
 
-    // --- New Animation Logic ---
-
     // 1. Prepare the detail screen content
     const locationName = document.getElementById('location-name');
     const detailMap = document.getElementById('location-detail-map');
@@ -482,9 +484,6 @@ function showLocationDetail(locationId) {
     locationName.textContent = location.name;
     if (location.detailMap) {
         detailMap.src = location.detailMap;
-        detailMap.style.display = 'block';
-    } else {
-        detailMap.style.display = 'none';
     }
     actionsContainer.innerHTML = '';
     location.actions.forEach(action => {
@@ -494,19 +493,16 @@ function showLocationDetail(locationId) {
         actionsContainer.appendChild(actionButton);
     });
 
-    // 2. Make the detail screen visible but keep it behind the game screen for now
+    // 2. Make the detail screen visible
     ui.locationDetailScreen.style.display = 'flex';
 
     // 3. Trigger the animation
     const mapLeft = document.getElementById('world-map-left');
     const mapRight = document.getElementById('world-map-right');
-    mapLeft.classList.add('split');
-    mapRight.classList.add('split');
-
-    // 4. After the animation, hide the game screen
-    setTimeout(() => {
-        ui.gameScreen.style.display = 'none';
-    }, 800); // Must match the transition duration in CSS
+    if (mapLeft && mapRight) {
+        mapLeft.classList.add('split');
+        mapRight.classList.add('split');
+    }
 }
 
 async function loadGame(fileName) {
@@ -632,17 +628,6 @@ function handleConfirmCustomChar() {
             customCard.querySelector('img').src = unlockedClass.img[selectedGender];
         }
 
-        const charData = {
-            name: customCharState.name,
-            image: customCard.querySelector('img').src,
-            stats: customCharState.stats
-        };
-
-        localStorage.setItem('selectedCharacter', JSON.stringify(charData));
-        if (window.opener) {
-            window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
-        }
-
         customCard.querySelectorAll('.gender-btn').forEach(btn => btn.disabled = true);
 
         document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
@@ -682,18 +667,11 @@ function handleConfirmPredefName() {
         stats: classData.stats
     };
 
-    // Save to localStorage for the current window
-    localStorage.setItem('selectedCharacter', JSON.stringify(charData));
-
-    // Send to opener window if it exists
     if (window.opener) {
         window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+    } else {
+        alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
     }
-
-    // Update UI
-    document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
-    card.classList.add('selected');
-    ui.startGameBtn.disabled = false;
 
     closeNameCharModal();
 }
