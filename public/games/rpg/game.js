@@ -613,6 +613,17 @@ function handleConfirmCustomChar() {
             customCard.querySelector('img').src = unlockedClass.img[selectedGender];
         }
 
+        const charData = {
+            name: customCharState.name,
+            image: customCard.querySelector('img').src,
+            stats: customCharState.stats
+        };
+
+        localStorage.setItem('selectedCharacter', JSON.stringify(charData));
+        if (window.opener) {
+            window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
+        }
+
         customCard.querySelectorAll('.gender-btn').forEach(btn => btn.disabled = true);
 
         document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
@@ -652,11 +663,18 @@ function handleConfirmPredefName() {
         stats: classData.stats
     };
 
+    // Save to localStorage for the current window
+    localStorage.setItem('selectedCharacter', JSON.stringify(charData));
+
+    // Send to opener window if it exists
     if (window.opener) {
         window.opener.postMessage({ type: 'character-selected', data: charData }, '*');
-    } else {
-        alert('Hauptfenster nicht gefunden. Charakterauswahl kann nicht gesendet werden.');
     }
+
+    // Update UI
+    document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    ui.startGameBtn.disabled = false;
 
     closeNameCharModal();
 }
