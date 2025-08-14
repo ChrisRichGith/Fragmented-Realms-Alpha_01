@@ -9,55 +9,55 @@ const NPC_CLASSES = {
 const LOCATIONS = {
     'city_1': {
         name: 'Varethyn',
-        coords: { top: '16.63%', left: '32.41%', width: '8%', height: '8%' },
+        coords: { top: '16.63%', left: '29.41%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'village_2': {
         name: 'Dornhall',
-        coords: { top: '38.44%', left: '25.37%', width: '8%', height: '8%' },
+        coords: { top: '38.44%', left: '22.37%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'village_3': {
         name: 'Myrrgarde',
-        coords: { top: '48.76%', left: '35.45%', width: '8%', height: '8%' },
+        coords: { top: '48.76%', left: '32.45%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'forest_4': {
         name: 'Ysmereth',
-        coords: { top: '29.48%', left: '48.12%', width: '8%', height: '8%' },
+        coords: { top: '29.48%', left: '45.12%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Wald.png',
         actions: ['explore', 'gather']
     },
     'village_5': {
         name: 'Elaris',
-        coords: { top: '65.37%', left: '23.81%', width: '8%', height: '8%' },
+        coords: { top: '65.37%', left: '20.81%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'city_6': {
         name: 'Bruchhain',
-        coords: { top: '66.31%', left: '39.30%', width: '8%', height: '8%' },
+        coords: { top: '66.31%', left: '36.30%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'city_7': {
         name: 'Tharvok',
-        coords: { top: '55.76%', left: '60.02%', width: '8%', height: '8%' },
+        coords: { top: '55.76%', left: '57.02%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'dungeon_8': {
         name: 'Schattenfels',
-        coords: { top: '68.84%', left: '65.02%', width: '8%', height: '8%' },
+        coords: { top: '68.84%', left: '62.02%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Dungeon.png',
         actions: ['enter_dungeon']
     },
     'village_9': {
         name: 'Kragmoor',
-        coords: { top: '26.16%', left: '70.51%', width: '8%', height: '8%' },
+        coords: { top: '26.16%', left: '67.51%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     }
