@@ -326,6 +326,7 @@ function setupEventListeners() {
             alert(`Fehler beim Speichern: ${error.message}`);
         }
     });
+
 }
 
 // Show a specific screen

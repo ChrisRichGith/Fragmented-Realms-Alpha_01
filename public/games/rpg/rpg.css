@@ -616,7 +616,7 @@ input[type=range]::-moz-range-thumb {
     position: absolute;
     background: rgba(255, 215, 0, 0.2); /* Faint gold highlight */
     border: 1px solid rgba(255, 215, 0, 0.5);
-    border-radius: 5px;
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
 }
