@@ -95,13 +95,13 @@ body, html {
 /* --- Game Screen Layout --- */
 .game-ui-left {
     position: absolute;
-    top: 80px; /* Positioned below the menu button */
+    top: 70px;
     left: 20px;
     z-index: 3;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 250px;
+    gap: 15px;
+    width: 200px;
     align-items: flex-start;
 }
 
@@ -116,8 +116,9 @@ body, html {
 #world-map-wrapper {
     width: 50%;
     height: 50%;
+    aspect-ratio: 1 / 1;
     max-width: 1024px;
-    max-height: 576px;
+    max-height: 1024px;
     border-radius: 10px;
     border: 3px solid #c9b037;
     box-shadow: 0 0 20px rgba(0,0,0,0.7);
@@ -125,66 +126,33 @@ body, html {
     overflow: hidden;
 }
 
-/* --- In-Game Menu Button --- */
+/* --- In-Game Menu --- */
 #rpg-menu-container {
     position: absolute;
     top: 20px;
     left: 20px;
     z-index: 10;
-}
-
-#rpg-menu-toggle-btn {
-    width: 40px;
-    height: 40px;
-    background: rgba(0,0,0,0.5);
-    border: 2px solid #c9b037;
-    border-radius: 50%;
-    padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
+    gap: 10px;
 }
 
-#rpg-menu-toggle-btn img {
-    width: 24px;
-    height: 24px;
-}
-
-#rpg-menu-popup {
-    position: absolute;
-    top: 50px;
-    left: 0;
-    background: rgba(74, 44, 42, 0.9);
-    border: 1px solid #c9b037;
-    border-radius: 5px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-}
-
-#rpg-menu-popup button {
-    background-color: #6d4c41;
+#rpg-menu-container button {
+    background-color: #4a2c2a;
     color: #f5eacb;
     border: 1px solid #c9b037;
     border-radius: 5px;
-    padding: 10px 15px;
+    padding: 8px 12px;
     font-family: 'Cinzel', serif;
-    font-size: 1em;
+    font-size: 0.9em;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
-    text-shadow: 1px 1px 2px #000;
-    width: 100%;
-    box-sizing: border-box;
 }
 
-#rpg-menu-popup button:hover {
-    background-color: #8a6d4f;
+#rpg-menu-container button:hover {
+    background-color: #6d4c41;
 }
 
-/* --- Map Animation --- */
+/* --- Map & Animation --- */
 .world-map-half {
     position: absolute;
     top: 0;
@@ -195,23 +163,10 @@ body, html {
     transition: transform 0.8s ease-in-out;
 }
 
-#world-map-left {
-    left: 0;
-    background-position: left center;
-}
-
-#world-map-right {
-    left: 50%;
-    background-position: right center;
-}
-
-#world-map-left.split {
-    transform: translateX(-100%);
-}
-
-#world-map-right.split {
-    transform: translateX(100%);
-}
+#world-map-left { left: 0; background-position: left center; }
+#world-map-right { left: 50%; background-position: right center; }
+#world-map-left.split { transform: translateX(-100%); }
+#world-map-right.split { transform: translateX(100%); }
 
 #location-overlay-container {
     position: absolute;
@@ -229,12 +184,75 @@ body, html {
     cursor: pointer;
 }
 
+#location-detail-screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    justify-content: center;
+    align-items: center;
+}
+
 #location-detail-map {
     width: 50%;
     height: 50%;
+    aspect-ratio: 1 / 1;
     max-width: 1024px;
-    max-height: 576px;
+    max-height: 1024px;
     object-fit: cover;
     border: 3px solid #c9b037;
     border-radius: 10px;
+}
+
+/* --- UI Cards --- */
+#game-character-card-container {
+    width: 100%;
+}
+
+.character-card-game {
+    background: rgba(40, 30, 30, 0.85);
+    border: 2px solid #8a6d4f;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.9em;
+}
+
+.character-card-game img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    border: 2px solid #4a2c2a;
+}
+
+.character-card-game h3 {
+    font-size: 1.4em;
+    margin-bottom: 10px;
+}
+
+#npc-selection-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.npc-card {
+    background: rgba(40, 30, 30, 0.7);
+    border: 1px solid #8a6d4f;
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8em;
+}
+
+.npc-card img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #4a2c2a;
 }
