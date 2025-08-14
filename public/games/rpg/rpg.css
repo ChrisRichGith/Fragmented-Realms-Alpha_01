@@ -107,13 +107,24 @@ body, html {
 
 #game-screen {
     display: none; /* Keep it hidden by default */
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    justify-content: space-around; /* Distribute space */
-    align-items: center;
     padding: 20px;
     box-sizing: border-box;
-    gap: 20px;
+}
+
+.game-ui-left {
+    position: absolute;
+    top: 80px; /* Below the menu button */
+    left: 20px;
+    z-index: 3; /* Above the map wrapper */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 220px; /* A fixed width for the left panel */
 }
 
 #game-character-card-container {
