@@ -4,43 +4,12 @@ body, html {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #1a1a2e; /* Fallback color */
+    background-color: #1a1a2e;
     background-image: url('/images/RPG/Background_Spiel.png');
     background-size: cover;
     background-position: center;
     color: white;
     font-family: 'Cinzel', serif;
-}
-
-#save-slots-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.save-slot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #6d4c41;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #8a6d4f;
-}
-
-.save-slot-name {
-    font-size: 1.2em;
-}
-
-.save-slot button {
-    background-color: #c9b037;
-    color: #4a2c2a;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
 }
 
 #game-container {
@@ -53,6 +22,7 @@ body, html {
     background: rgba(0, 0, 0, 0.3);
 }
 
+/* --- Screens --- */
 #title-screen, #options-screen, #character-creation-screen {
     background: rgba(0, 0, 0, 0.75);
     padding: 40px;
@@ -65,6 +35,29 @@ body, html {
     align-items: center;
 }
 
+#game-screen, #location-detail-screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#game-screen {
+    z-index: 2;
+}
+
+#location-detail-screen {
+    z-index: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* --- Main Menu --- */
 #game-logo {
     max-width: 80%;
     height: auto;
@@ -97,35 +90,24 @@ body, html {
 .menu-buttons button:hover {
     background-color: #6d4c41;
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
 }
 
-#game-screen {
-    display: none;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
+/* --- Game Screen Layout --- */
 .game-ui-left {
+    position: absolute;
+    top: 80px; /* Positioned below the menu button */
+    left: 20px;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     gap: 20px;
     width: 250px;
-    flex-shrink: 0;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 3; /* Above the map */
+    align-items: flex-start;
 }
 
 #world-map-container {
     width: 100%;
     height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -135,15 +117,74 @@ body, html {
     width: 50%;
     height: 50%;
     max-width: 1024px;
-    max-height: 576px; /* 16:9 aspect ratio for a common resolution */
+    max-height: 576px;
     border-radius: 10px;
     border: 3px solid #c9b037;
     box-shadow: 0 0 20px rgba(0,0,0,0.7);
     position: relative;
     overflow: hidden;
-    z-index: 2;
 }
 
+/* --- In-Game Menu Button --- */
+#rpg-menu-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+#rpg-menu-toggle-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid #c9b037;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#rpg-menu-toggle-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+#rpg-menu-popup {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    background: rgba(74, 44, 42, 0.9);
+    border: 1px solid #c9b037;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+#rpg-menu-popup button {
+    background-color: #6d4c41;
+    color: #f5eacb;
+    border: 1px solid #c9b037;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-family: 'Cinzel', serif;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    text-shadow: 1px 1px 2px #000;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#rpg-menu-popup button:hover {
+    background-color: #8a6d4f;
+}
+
+/* --- Map Animation --- */
 .world-map-half {
     position: absolute;
     top: 0;
@@ -186,24 +227,6 @@ body, html {
     border: 1px solid rgba(255, 215, 0, 0.5);
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-
-.location-overlay:hover {
-    background: rgba(255, 215, 0, 0.4);
-    border: 1px solid rgba(255, 215, 0, 0.8);
-}
-
-#location-detail-screen {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; /* Initially behind everything */
-    justify-content: center;
-    align-items: center;
 }
 
 #location-detail-map {
