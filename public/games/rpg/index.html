@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="rpg.css">
 </head>
 <body>
+    <div id="editor-coords-display" style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #fff; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 14px; z-index: 9999; pointer-events: none;"></div>
     <div id="game-container">
         <!-- Title Screen -->
         <div id="title-screen">
@@ -58,16 +59,16 @@
 
         <!-- Game Screen (initially hidden) -->
         <div id="game-screen" style="display: none;">
-            <div class="game-ui-left">
-                <div id="rpg-menu-container">
-                    <button id="rpg-menu-toggle-btn">
-                        <img src="/images/RPG/Menu.png" alt="Menu">
-                    </button>
-                    <div id="rpg-menu-popup" class="hidden">
-                        <button id="save-party-btn">Party speichern</button>
-                        <button id="load-party-btn">Spiel laden</button>
-                    </div>
+            <div id="rpg-menu-container">
+                <button id="rpg-menu-toggle-btn">
+                    <img src="/images/RPG/Menu.png" alt="Menu">
+                </button>
+                <div id="rpg-menu-popup" class="hidden">
+                    <button id="save-party-btn">Spiel speichern</button>
+                    <button id="load-party-btn">Spiel laden</button>
                 </div>
+            </div>
+            <div class="game-ui-left">
                 <div id="game-character-card-container">
                     <!-- Character card will be injected here -->
                 </div>
@@ -76,19 +77,20 @@
                 </div>
             </div>
             <div id="world-map-container">
-                <div style="position: relative; display: inline-block;">
-                    <img id="world-map" src="/images/RPG/Worldmap.png" alt="World Map">
+                <div id="location-title-display"></div>
+                <div id="world-map-wrapper">
+                    <div id="world-map-left" class="world-map-half"></div>
+                    <div id="world-map-right" class="world-map-half"></div>
                     <div id="location-overlay-container"></div>
                 </div>
+                 <!-- Location Detail Screen is now INSIDE the game screen for positioning context -->
+                <div id="location-detail-screen" style="display: none;">
+                    <h2 id="location-name"></h2>
+                    <img id="location-detail-map" src="" alt="Location Map">
+                    <div id="location-actions"></div>
+                    <button id="back-to-world-map-btn">Zurück zur Weltkarte</button>
+                </div>
             </div>
-        </div>
-
-        <!-- Location Detail Screen (initially hidden) -->
-        <div id="location-detail-screen" style="display: none;">
-            <h2 id="location-name"></h2>
-            <img id="location-detail-map" src="" alt="Location Map">
-            <div id="location-actions"></div>
-            <button id="back-to-world-map-btn">Zurück zur Weltkarte</button>
         </div>
     </div>
 
