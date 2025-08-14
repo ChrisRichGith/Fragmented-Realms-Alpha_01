@@ -97,6 +97,18 @@ let namingContext = null;
 let npcParty = [null, null, null];
 let currentLocationId = null;
 
+// --- Editor State ---
+let editorState = {
+    target: null,
+    mode: null, // 'move' or 'resize'
+    startX: 0,
+    startY: 0,
+    startWidth: 0,
+    startHeight: 0,
+    startLeft: 0,
+    startTop: 0
+};
+
 
 // Initialize game
 function init() {
@@ -335,6 +347,66 @@ function setupEventListeners() {
         }
     });
 
+    // --- Editor Logic ---
+    const mapWrapper = document.getElementById('world-map-wrapper');
+    const resizeHandle = document.getElementById('resize-br');
+    const editorCoordsDisplay = document.getElementById('editor-coords-display');
+
+    function updateEditorDisplay() {
+        if (!editorState.target || !editorCoordsDisplay) return;
+        const style = window.getComputedStyle(editorState.target);
+        editorCoordsDisplay.innerHTML = `
+            top: ${style.top} <br>
+            left: ${style.left} <br>
+            width: ${style.width} <br>
+            height: ${style.height}
+        `;
+    }
+
+    mapWrapper.addEventListener('mousedown', (e) => {
+        if (e.target !== mapWrapper) return; // Only drag the wrapper itself, not children
+        editorState.mode = 'move';
+        editorState.target = mapWrapper;
+        const style = window.getComputedStyle(mapWrapper);
+        editorState.startLeft = parseFloat(style.left);
+        editorState.startTop = parseFloat(style.top);
+        editorState.startX = e.clientX;
+        editorState.startY = e.clientY;
+    });
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+        e.stopPropagation(); // Prevent wrapper's drag listener
+        editorState.mode = 'resize';
+        editorState.target = mapWrapper;
+        const style = window.getComputedStyle(mapWrapper);
+        editorState.startWidth = parseFloat(style.width);
+        editorState.startHeight = parseFloat(style.height);
+        editorState.startX = e.clientX;
+        editorState.startY = e.clientY;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!editorState.target) return;
+
+        const dx = e.clientX - editorState.startX;
+        const dy = e.clientY - editorState.startY;
+
+        if (editorState.mode === 'move') {
+            editorState.target.style.left = `${editorState.startLeft + dx}px`;
+            editorState.target.style.top = `${editorState.startTop + dy}px`;
+        } else if (editorState.mode === 'resize') {
+            const newWidth = editorState.startWidth + dx;
+            const newHeight = editorState.startHeight + dy;
+            editorState.target.style.width = `${newWidth}px`;
+            editorState.target.style.height = `${newHeight}px`;
+        }
+        updateEditorDisplay();
+    });
+
+    document.addEventListener('mouseup', () => {
+        editorState.target = null;
+        editorState.mode = null;
+    });
 }
 
 // Show a specific screen
