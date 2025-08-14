@@ -219,9 +219,6 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => {
-        // Show the game screen first to have a backdrop
-        ui.gameScreen.style.display = 'flex';
-
         // Hide the location title
         ui.locationTitleDisplay.style.opacity = 0;
 
@@ -521,10 +518,6 @@ function showLocationDetail(locationId) {
     mapLeft.classList.add('split');
     mapRight.classList.add('split');
 
-    // 4. After the animation, hide the game screen
-    setTimeout(() => {
-        ui.gameScreen.style.display = 'none';
-    }, 800); // Must match the transition duration in CSS
 }
 
 async function loadGame(fileName) {
