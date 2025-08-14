@@ -58,24 +58,28 @@
 
         <!-- Game Screen (initially hidden) -->
         <div id="game-screen" style="display: none;">
-            <div id="rpg-menu-container">
-                <button id="rpg-menu-toggle-btn">
-                    <img src="/images/RPG/Menu.png" alt="Menu">
-                </button>
-                <div id="rpg-menu-popup" class="hidden">
-                    <button id="save-party-btn">Party speichern</button>
-                    <button id="load-party-btn">Spiel laden</button>
+            <div class="game-ui-left">
+                <div id="rpg-menu-container">
+                    <button id="rpg-menu-toggle-btn">
+                        <img src="/images/RPG/Menu.png" alt="Menu">
+                    </button>
+                    <div id="rpg-menu-popup" class="hidden">
+                        <button id="save-party-btn">Party speichern</button>
+                        <button id="load-party-btn">Spiel laden</button>
+                    </div>
+                </div>
+                <div id="game-character-card-container">
+                    <!-- Character card will be injected here -->
+                </div>
+                <div id="npc-selection-container">
+                    <!-- NPC cards will be injected here -->
                 </div>
             </div>
-            <div id="npc-selection-container">
-                <!-- NPC cards will be injected here -->
-            </div>
-            <div id="game-character-card-container">
-                <!-- Character card will be injected here -->
-            </div>
             <div id="world-map-container">
-                <img id="world-map" src="/images/RPG/Worldmap.png" alt="World Map">
-                <div id="location-overlay-container"></div>
+                <div style="position: relative; display: inline-block;">
+                    <img id="world-map" src="/images/RPG/Worldmap.png" alt="World Map">
+                    <div id="location-overlay-container"></div>
+                </div>
             </div>
         </div>
 

@@ -354,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     startRpgBtn.addEventListener('click', () => {
-        const url = characterIsSelected ? '/games/rpg/index.html?action=continue' : '/games/rpg/index.html';
+        const url = '/games/rpg/index.html';
         window.open(url, '_blank');
     });
 
