@@ -9,55 +9,55 @@ const NPC_CLASSES = {
 const LOCATIONS = {
     'city_1': {
         name: 'Varethyn',
-        coords: { top: '16.63%', left: '24.41%', width: '8%', height: '8%' },
+        coords: { top: '10.72%', left: '20.16%', width: '10%', height: '15%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'village_2': {
         name: 'Dornhall',
-        coords: { top: '38.44%', left: '17.37%', width: '8%', height: '8%' },
+        coords: { top: '37.87%', left: '12.56%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'village_3': {
         name: 'Myrrgarde',
-        coords: { top: '48.76%', left: '27.45%', width: '8%', height: '8%' },
+        coords: { top: '47.63%', left: '24.36%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'forest_4': {
         name: 'Ysmereth',
-        coords: { top: '29.48%', left: '40.12%', width: '8%', height: '8%' },
+        coords: { top: '25.25%', left: '35.54%', width: '15%', height: '15%' },
         detailMap: '/images/RPG/Wald.png',
         actions: ['explore', 'gather']
     },
     'village_5': {
         name: 'Elaris',
-        coords: { top: '65.37%', left: '15.81%', width: '8%', height: '8%' },
+        coords: { top: '64.24%', left: '11.23%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     },
     'city_6': {
         name: 'Bruchhain',
-        coords: { top: '66.31%', left: '31.30%', width: '8%', height: '8%' },
+        coords: { top: '64.77%', left: '27.98%', width: '10%', height: '10%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'city_7': {
         name: 'Tharvok',
-        coords: { top: '55.76%', left: '52.02%', width: '8%', height: '8%' },
+        coords: { top: '52.01%', left: '53.75%', width: '10%', height: '13%' },
         detailMap: '/images/RPG/Citymap.png',
         actions: ['trade', 'quest', 'rest']
     },
     'dungeon_8': {
         name: 'Schattenfels',
-        coords: { top: '68.84%', left: '57.02%', width: '8%', height: '8%' },
+        coords: { top: '68.56%', left: '57.93%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Dungeon.png',
         actions: ['enter_dungeon']
     },
     'village_9': {
         name: 'Kragmoor',
-        coords: { top: '26.16%', left: '62.51%', width: '8%', height: '8%' },
+        coords: { top: '26.16%', left: '63.88%', width: '8%', height: '8%' },
         detailMap: '/images/RPG/Villagemap.png',
         actions: ['quest', 'rest']
     }
@@ -96,10 +96,6 @@ let namingContext = null;
 // Party state
 let npcParty = [null, null, null];
 let currentLocationId = null;
-
-let draggedElement = null;
-let offsetX = 0;
-let offsetY = 0;
 
 
 // Initialize game
@@ -331,35 +327,6 @@ function setupEventListeners() {
         }
     });
 
-    const coordsDisplay = document.getElementById('coords-display');
-    const worldMapContainer = document.getElementById('world-map-container').querySelector('div');
-
-    document.addEventListener('mousemove', (e) => {
-        if (!draggedElement) return;
-
-        const containerRect = worldMapContainer.getBoundingClientRect();
-
-        let newX = e.clientX - offsetX;
-        let newY = e.clientY - offsetY;
-
-        // Ensure the element stays within the container bounds
-        newX = Math.max(0, Math.min(newX, containerRect.width - draggedElement.offsetWidth));
-        newY = Math.max(0, Math.min(newY, containerRect.height - draggedElement.offsetHeight));
-
-        const percentX = (newX / containerRect.width * 100).toFixed(2);
-        const percentY = (newY / containerRect.height * 100).toFixed(2);
-
-        draggedElement.style.left = `${percentX}%`;
-        draggedElement.style.top = `${percentY}%`;
-
-        if (coordsDisplay) {
-            coordsDisplay.textContent = `Coords: T: ${percentY}%, L: ${percentX}%`;
-        }
-    });
-
-    document.addEventListener('mouseup', () => {
-        draggedElement = null;
-    });
 }
 
 // Show a specific screen
@@ -486,17 +453,9 @@ function createLocationOverlays() {
         overlay.dataset.locationId = locationId;
         overlay.title = location.name; // Show name on hover
 
-        // overlay.addEventListener('click', () => {
-        //     playClickSound();
-        //     showLocationDetail(locationId);
-        // });
-
-        overlay.addEventListener('mousedown', (e) => {
-            draggedElement = overlay;
-            const rect = draggedElement.getBoundingClientRect();
-            const containerRect = overlay.parentElement.getBoundingClientRect();
-            offsetX = e.clientX - rect.left + containerRect.left;
-            offsetY = e.clientY - rect.top + containerRect.top;
+        overlay.addEventListener('click', () => {
+            playClickSound();
+            showLocationDetail(locationId);
         });
 
         overlayContainer.appendChild(overlay);
