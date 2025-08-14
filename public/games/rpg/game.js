@@ -120,6 +120,7 @@ function init() {
         startGameDirektBtn: document.getElementById('start-game-direkt-btn'),
         backToWorldMapBtn: document.getElementById('back-to-world-map-btn'),
         savePartyBtn: document.getElementById('save-party-btn'),
+        loadPartyBtn: document.getElementById('load-party-btn'),
         rpgMenuToggleBtn: document.getElementById('rpg-menu-toggle-btn'),
         rpgMenuPopup: document.getElementById('rpg-menu-popup'),
 
@@ -208,10 +209,6 @@ function setupEventListeners() {
     });
 
     ui.newGameBtn.addEventListener('click', () => showScreen('character-creation'));
-    ui.loadGameBtn.addEventListener('click', () => {
-        console.log('Load Game clicked - functionality to be implemented.');
-        alert('Laden-Funktion noch nicht implementiert.');
-    });
     ui.optionsBtn.addEventListener('click', () => {
         console.log("Options button clicked!");
         showScreen('options');
@@ -256,7 +253,7 @@ function setupEventListeners() {
         ui.saveGameModal.style.display = 'none';
     });
 
-    ui.loadGameBtn.addEventListener('click', async () => {
+    const showLoadGameModal = async () => {
         try {
             const response = await fetch('/api/gamesaves');
             if (!response.ok) {
@@ -267,7 +264,7 @@ function setupEventListeners() {
             ui.saveSlotsContainer.innerHTML = ''; // Clear previous slots
 
             if (saveFiles.length === 0) {
-                ui.saveSlotsContainer.innerHTML = '<p>No save games found.</p>';
+                ui.saveSlotsContainer.innerHTML = '<p>Keine Spielstände gefunden.</p>';
             } else {
                 saveFiles.forEach(fileName => {
                     const button = document.createElement('button');
@@ -278,12 +275,15 @@ function setupEventListeners() {
                 });
             }
 
-            ui.loadGameModal.style.display = 'block';
+            ui.loadGameModal.style.display = 'flex';
         } catch (error) {
             console.error('Error loading save games:', error);
-            // Optionally, show an error message to the user
+            alert('Fehler beim Abrufen der Spielstände.');
         }
-    });
+    };
+
+    ui.loadGameBtn.addEventListener('click', showLoadGameModal);
+    ui.loadPartyBtn.addEventListener('click', showLoadGameModal);
 
     ui.cancelLoadBtn.addEventListener('click', () => {
         ui.loadGameModal.style.display = 'none';
