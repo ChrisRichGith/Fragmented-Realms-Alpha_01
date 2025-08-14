@@ -97,6 +97,10 @@ let namingContext = null;
 let npcParty = [null, null, null];
 let currentLocationId = null;
 
+let draggedElement = null;
+let offsetX = 0;
+let offsetY = 0;
+
 
 // Initialize game
 function init() {
@@ -327,6 +331,35 @@ function setupEventListeners() {
         }
     });
 
+    const coordsDisplay = document.getElementById('coords-display');
+    const worldMapContainer = document.getElementById('world-map-container').querySelector('div');
+
+    document.addEventListener('mousemove', (e) => {
+        if (!draggedElement) return;
+
+        const containerRect = worldMapContainer.getBoundingClientRect();
+
+        let newX = e.clientX - offsetX;
+        let newY = e.clientY - offsetY;
+
+        // Ensure the element stays within the container bounds
+        newX = Math.max(0, Math.min(newX, containerRect.width - draggedElement.offsetWidth));
+        newY = Math.max(0, Math.min(newY, containerRect.height - draggedElement.offsetHeight));
+
+        const percentX = (newX / containerRect.width * 100).toFixed(2);
+        const percentY = (newY / containerRect.height * 100).toFixed(2);
+
+        draggedElement.style.left = `${percentX}%`;
+        draggedElement.style.top = `${percentY}%`;
+
+        if (coordsDisplay) {
+            coordsDisplay.textContent = `Coords: T: ${percentY}%, L: ${percentX}%`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        draggedElement = null;
+    });
 }
 
 // Show a specific screen
@@ -453,9 +486,17 @@ function createLocationOverlays() {
         overlay.dataset.locationId = locationId;
         overlay.title = location.name; // Show name on hover
 
-        overlay.addEventListener('click', () => {
-            playClickSound();
-            showLocationDetail(locationId);
+        // overlay.addEventListener('click', () => {
+        //     playClickSound();
+        //     showLocationDetail(locationId);
+        // });
+
+        overlay.addEventListener('mousedown', (e) => {
+            draggedElement = overlay;
+            const rect = draggedElement.getBoundingClientRect();
+            const containerRect = overlay.parentElement.getBoundingClientRect();
+            offsetX = e.clientX - rect.left + containerRect.left;
+            offsetY = e.clientY - rect.top + containerRect.top;
         });
 
         overlayContainer.appendChild(overlay);
