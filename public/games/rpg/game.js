@@ -97,6 +97,10 @@ let namingContext = null;
 let npcParty = [null, null, null];
 let currentLocationId = null;
 
+// --- Editor State for location overlays ---
+let draggedOverlay = null;
+let overlayOffsetX = 0;
+let overlayOffsetY = 0;
 
 // Initialize game
 function init() {
@@ -123,6 +127,8 @@ function init() {
         loadPartyBtn: document.getElementById('load-party-btn'),
         rpgMenuToggleBtn: document.getElementById('rpg-menu-toggle-btn'),
         rpgMenuPopup: document.getElementById('rpg-menu-popup'),
+        locationOverlayContainer: document.getElementById('location-overlay-container'),
+        locationTitleDisplay: document.getElementById('location-title-display'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -218,16 +224,25 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => {
-        // Hide the detail screen content immediately
-        ui.locationDetailScreen.style.display = 'none';
+        // Show the game screen first to have a backdrop
+        ui.gameScreen.style.display = 'flex';
 
-        // Find the map halves and remove the .split class to trigger the closing animation
+        // Hide the location title
+        ui.locationTitleDisplay.style.opacity = 0;
+
+        // Remove the split class to trigger the closing animation
         const mapLeft = document.getElementById('world-map-left');
         const mapRight = document.getElementById('world-map-right');
-        if (mapLeft && mapRight) {
-            mapLeft.classList.remove('split');
-            mapRight.classList.remove('split');
-        }
+        mapLeft.classList.remove('split');
+        mapRight.classList.remove('split');
+
+        // Make overlays visible again
+        ui.locationOverlayContainer.style.display = 'block';
+
+        // After the animation, hide the location detail screen
+        setTimeout(() => {
+            ui.locationDetailScreen.style.display = 'none';
+        }, 800); // Must match animation duration
     });
     ui.savePartyBtn.addEventListener('click', () => {
         ui.saveGameModal.style.display = 'flex';
@@ -336,6 +351,32 @@ function setupEventListeners() {
             console.error('Error saving game:', error);
             alert(`Fehler beim Speichern: ${error.message}`);
         }
+    });
+
+    // --- Location Overlay Editor Logic ---
+    const editorCoordsDisplay = document.getElementById('editor-coords-display');
+
+    document.addEventListener('mousemove', (e) => {
+        if (!draggedOverlay) return;
+
+        const containerRect = draggedOverlay.parentElement.getBoundingClientRect();
+
+        let newX = e.clientX - containerRect.left - overlayOffsetX;
+        let newY = e.clientY - containerRect.top - overlayOffsetY;
+
+        const percentX = (newX / containerRect.width * 100);
+        const percentY = (newY / containerRect.height * 100);
+
+        draggedOverlay.style.left = `${percentX.toFixed(2)}%`;
+        draggedOverlay.style.top = `${percentY.toFixed(2)}%`;
+
+        if (editorCoordsDisplay) {
+            editorCoordsDisplay.textContent = `T: ${percentY.toFixed(2)}%, L: ${percentX.toFixed(2)}%`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        draggedOverlay = null;
     });
 }
 
@@ -463,9 +504,20 @@ function createLocationOverlays() {
         overlay.dataset.locationId = locationId;
         overlay.title = location.name; // Show name on hover
 
-        overlay.addEventListener('click', () => {
-            playClickSound();
-            showLocationDetail(locationId);
+        // Temporarily disable the click to open details
+        // overlay.addEventListener('click', () => {
+        //     playClickSound();
+        //     showLocationDetail(locationId);
+        // });
+
+        // Add mousedown listener for dragging
+        overlay.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            draggedOverlay = overlay;
+            const rect = draggedOverlay.getBoundingClientRect();
+            // Calculate offset from top-left of the element, not the page
+            overlayOffsetX = e.clientX - rect.left;
+            overlayOffsetY = e.clientY - rect.top;
         });
 
         overlayContainer.appendChild(overlay);
@@ -476,6 +528,8 @@ function showLocationDetail(locationId) {
     currentLocationId = locationId;
     const location = LOCATIONS[locationId];
     if (!location) return;
+
+    // --- New Animation Logic ---
 
     // 1. Prepare the detail screen content
     const locationName = document.getElementById('location-name');
@@ -493,16 +547,26 @@ function showLocationDetail(locationId) {
         actionsContainer.appendChild(actionButton);
     });
 
-    // 2. Make the detail screen visible
+    // 2. Make the detail screen visible but keep it behind the game screen for now
     ui.locationDetailScreen.style.display = 'flex';
+
+    // Hide overlays
+    ui.locationOverlayContainer.style.display = 'none';
+
+    // Show location title
+    ui.locationTitleDisplay.textContent = location.name;
+    ui.locationTitleDisplay.style.opacity = 1;
 
     // 3. Trigger the animation
     const mapLeft = document.getElementById('world-map-left');
     const mapRight = document.getElementById('world-map-right');
-    if (mapLeft && mapRight) {
-        mapLeft.classList.add('split');
-        mapRight.classList.add('split');
-    }
+    mapLeft.classList.add('split');
+    mapRight.classList.add('split');
+
+    // 4. After the animation, hide the game screen
+    setTimeout(() => {
+        ui.gameScreen.style.display = 'none';
+    }, 800); // Must match the transition duration in CSS
 }
 
 async function loadGame(fileName) {
