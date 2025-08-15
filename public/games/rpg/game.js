@@ -124,6 +124,7 @@ function init() {
         rpgMenuPopup: document.getElementById('rpg-menu-popup'),
         locationOverlayContainer: document.getElementById('location-overlay-container'),
         locationTitleDisplay: document.getElementById('location-title-display'),
+        worldMapWrapper: document.getElementById('world-map-wrapper'),
 
         // Game UI
         levelEl: document.getElementById('level'),
@@ -234,6 +235,7 @@ function setupEventListeners() {
         // After the animation, hide the location detail screen
         setTimeout(() => {
             ui.locationDetailScreen.style.display = 'none';
+            ui.worldMapWrapper.style.zIndex = 2; // Restore z-index
         }, 800); // Must match animation duration
     });
     ui.savePartyBtn.addEventListener('click', () => {
@@ -513,8 +515,9 @@ function showLocationDetail(locationId) {
         actionsContainer.appendChild(actionButton);
     });
 
-    // 2. Make the detail screen visible but keep it behind the game screen for now
-    ui.locationDetailScreen.style.display = 'flex';
+    // 2. Make the detail screen visible and bring it to the front
+    ui.worldMapWrapper.style.zIndex = 0;
+    ui.locationDetailScreen.style.display = 'block';
 
     // Hide overlays
     ui.locationOverlayContainer.style.display = 'none';
