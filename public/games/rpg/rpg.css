@@ -211,6 +211,10 @@ body, html {
     border-radius: 10px;
 }
 
+#location-name {
+    display: none;
+}
+
 #location-title-display {
     position: absolute;
     top: 30px; /* Adjust as needed */

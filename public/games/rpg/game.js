@@ -487,7 +487,6 @@ function showLocationDetail(locationId) {
     const locationName = document.getElementById('location-name');
     const detailMap = document.getElementById('location-detail-map');
     const actionsContainer = document.getElementById('location-actions');
-    locationName.textContent = location.name;
     if (location.detailMap) {
         detailMap.src = location.detailMap;
     }
