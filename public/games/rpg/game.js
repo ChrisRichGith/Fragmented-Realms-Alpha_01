@@ -220,6 +220,11 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => {
+        // Bring map wrapper to front so the closing animation is visible
+        ui.worldMapWrapper.style.zIndex = 2;
+
+        // Hide the location title
+        ui.locationTitleDisplay.style.opacity = 0;
 
         // Remove the split class to trigger the closing animation
         const mapLeft = document.getElementById('world-map-left');
@@ -512,19 +517,22 @@ function showLocationDetail(locationId) {
         actionsContainer.appendChild(actionButton);
     });
 
-    // 2. Make the detail screen visible and bring it to the front
-    ui.worldMapWrapper.style.zIndex = 0;
-    ui.locationDetailScreen.style.display = 'block';
-
-    // Hide overlays
+    // 2. Hide overlays and show title
     ui.locationOverlayContainer.style.display = 'none';
+    ui.locationTitleDisplay.textContent = location.name;
+    ui.locationTitleDisplay.style.opacity = 1;
 
-    // 3. Trigger the animation
+    // 3. Trigger the opening animation
     const mapLeft = document.getElementById('world-map-left');
     const mapRight = document.getElementById('world-map-right');
     mapLeft.classList.add('split');
     mapRight.classList.add('split');
 
+    // 4. After the animation, show the detail screen and send map to back
+    setTimeout(() => {
+        ui.locationDetailScreen.style.display = 'block';
+        ui.worldMapWrapper.style.zIndex = 0;
+    }, 800); // Must match animation duration
 }
 
 async function loadGame(fileName) {
