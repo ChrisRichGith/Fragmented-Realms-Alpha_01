@@ -198,8 +198,6 @@ body, html {
     border-radius: 10px;
     z-index: 1; /* Below the world map */
     display: none; /* Controlled by JS */
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
     background: #000;
 }
@@ -209,6 +207,38 @@ body, html {
     height: 100%;
     object-fit: cover;
     border-radius: 10px;
+}
+
+#location-actions {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5; /* Above the map image */
+    display: flex;
+    gap: 15px;
+}
+
+#back-to-world-map-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5; /* Above the map image */
+    background-color: #4a2c2a;
+    color: #f5eacb;
+    border: 2px solid #c9b037;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+#back-to-world-map-btn:hover {
+    background-color: #6d4c41;
+    border-color: #f5eacb;
 }
 
 #location-name {
@@ -680,8 +710,17 @@ input[type=range]::-moz-range-thumb {
     height: 100%;
 }
 
+.location-spot {
+    position: absolute;
+    /* top, left, width, height are set via JS */
+}
+
 .location-overlay {
     position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 50%;
@@ -690,8 +729,31 @@ input[type=range]::-moz-range-thumb {
 }
 
 .location-overlay:hover {
-    background: rgba(255, 215, 0, 0.3);
-    border: 1px solid rgba(255, 215, 0, 0.6);
+    background: rgba(255, 215, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.7);
+}
+
+.location-name-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5px; /* Space between overlay and label */
+    padding: 3px 8px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #f5eacb;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+    opacity: 0.85;
+}
+
+.location-spot:hover .location-name-label {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05);
 }
 
 #save-name-input {

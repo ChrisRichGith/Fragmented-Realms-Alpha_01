@@ -461,21 +461,33 @@ function createLocationOverlays() {
 
     for (const locationId in LOCATIONS) {
         const location = LOCATIONS[locationId];
+
+        // Create a container for each location spot
+        const locationSpot = document.createElement('div');
+        locationSpot.className = 'location-spot';
+        locationSpot.style.top = location.coords.top;
+        locationSpot.style.left = location.coords.left;
+        locationSpot.style.width = location.coords.width;
+        locationSpot.style.height = location.coords.height;
+        locationSpot.dataset.locationId = locationId;
+        locationSpot.title = location.name; // Show name on hover
+
+        // The clickable overlay itself
         const overlay = document.createElement('div');
         overlay.className = 'location-overlay';
-        overlay.style.top = location.coords.top;
-        overlay.style.left = location.coords.left;
-        overlay.style.width = location.coords.width;
-        overlay.style.height = location.coords.height;
-        overlay.dataset.locationId = locationId;
-        overlay.title = location.name; // Show name on hover
-
         overlay.addEventListener('click', () => {
             playClickSound();
             showLocationDetail(locationId);
         });
 
-        overlayContainer.appendChild(overlay);
+        // The name label
+        const nameLabel = document.createElement('div');
+        nameLabel.className = 'location-name-label';
+        nameLabel.textContent = location.name;
+
+        locationSpot.appendChild(overlay);
+        locationSpot.appendChild(nameLabel);
+        overlayContainer.appendChild(locationSpot);
     }
 }
 
