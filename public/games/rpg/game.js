@@ -232,12 +232,14 @@ function setupEventListeners() {
         mapLeft.classList.remove('split');
         mapRight.classList.remove('split');
 
-        // Make overlays visible again
-        ui.locationOverlayContainer.style.display = 'block';
-
-        // After the animation, hide the location detail screen
+        // After the animation, hide the location detail screen and show overlays
         setTimeout(() => {
             ui.locationDetailScreen.style.display = 'none';
+            ui.locationOverlayContainer.style.display = 'block';
+            // Use a nested timeout to allow the display property to apply before adding the class for the transition
+            setTimeout(() => {
+                ui.locationOverlayContainer.classList.add('active');
+            }, 20);
         }, 800); // Must match animation duration
     });
     ui.savePartyBtn.addEventListener('click', () => {
@@ -518,6 +520,7 @@ function showLocationDetail(locationId) {
     });
 
     // 2. Hide overlays and show title
+    ui.locationOverlayContainer.classList.remove('active');
     ui.locationOverlayContainer.style.display = 'none';
     ui.locationTitleDisplay.textContent = location.name;
     ui.locationTitleDisplay.style.opacity = 1;
