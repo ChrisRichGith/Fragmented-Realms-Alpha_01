@@ -219,9 +219,6 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => {
-        // Hide the location title
-        ui.locationTitleDisplay.style.opacity = 0;
-
         // Remove the split class to trigger the closing animation
         const mapLeft = document.getElementById('world-map-left');
         const mapRight = document.getElementById('world-map-right');
@@ -507,10 +504,6 @@ function showLocationDetail(locationId) {
 
     // Hide overlays
     ui.locationOverlayContainer.style.display = 'none';
-
-    // Show location title
-    ui.locationTitleDisplay.textContent = location.name;
-    ui.locationTitleDisplay.style.opacity = 1;
 
     // 3. Trigger the animation
     const mapLeft = document.getElementById('world-map-left');
