@@ -220,6 +220,9 @@ function setupEventListeners() {
     ui.startGameBtn.addEventListener('click', () => showScreen('game'));
     ui.startGameDirektBtn.addEventListener('click', () => showScreen('game'));
     ui.backToWorldMapBtn.addEventListener('click', () => {
+        // Bring map wrapper to front so the closing animation is visible
+        ui.worldMapWrapper.style.zIndex = 2;
+
         // Hide the location title
         ui.locationTitleDisplay.style.opacity = 0;
 
@@ -235,7 +238,6 @@ function setupEventListeners() {
         // After the animation, hide the location detail screen
         setTimeout(() => {
             ui.locationDetailScreen.style.display = 'none';
-            ui.worldMapWrapper.style.zIndex = 2; // Restore z-index
         }, 800); // Must match animation duration
     });
     ui.savePartyBtn.addEventListener('click', () => {
