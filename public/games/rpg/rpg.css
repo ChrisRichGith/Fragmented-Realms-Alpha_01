@@ -218,7 +218,7 @@ body, html {
 #location-title-display {
     position: absolute;
     top: 30px; /* Adjust as needed */
-    left: 50%;
+    left: 992px;
     transform: translateX(-50%);
     background: rgba(0,0,0,0.7);
     color: #f5eacb;
